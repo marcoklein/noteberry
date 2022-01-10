@@ -15,7 +15,7 @@
   "exports": "./dist/index.js",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html --public-url ./",
+    "build": "parcel build src/index.html --public-url .",
     "deploy": "yarn build && gh-pages -d ./dist",
     "test": "mocha --loader=ts-node/esm src/**/*.spec.ts"
   },
