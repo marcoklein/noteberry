@@ -16,7 +16,7 @@
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html",
-    "deploy": "yarn build && gh-pages ./dist",
+    "deploy": "yarn build && gh-pages -d ./dist",
     "test": "mocha --loader=ts-node/esm src/**/*.spec.ts"
   },
   "devDependencies": {
