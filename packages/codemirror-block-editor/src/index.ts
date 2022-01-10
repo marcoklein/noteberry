@@ -1,94 +1,106 @@
 import { basicSetup, EditorState, EditorView } from "@codemirror/basic-setup";
-import { Extension, StateField, StateEffect, Facet } from "@codemirror/state";
-import {
-  DecorationSet,
-  Decoration,
-  ViewPlugin,
-  ViewUpdate,
-} from "@codemirror/view";
+import { Extension, StateEffect, StateField } from "@codemirror/state";
+import { Decoration, DecorationSet, keymap } from "@codemirror/view";
 import { vim } from "@replit/codemirror-vim";
-import { RangeSetBuilder } from "@codemirror/rangeset";
-import { keymap } from "@codemirror/view";
 
 const baseTheme = EditorView.baseTheme({
-  ".cm-indentation": { paddingLeft: "3rem" },
+  ".cm-block-indentation": { paddingLeft: "3rem" },
 });
 
-const stepSize = Facet.define<number, number>({
-  combine: (values) => (values.length ? Math.min(...values) : 2),
+const blockIndendationDecoration = Decoration.line({
+  attributes: { class: "cm-block-indentation" },
 });
 
-const indendationDecoration = Decoration.line({
-  attributes: { class: "cm-indentation" },
-});
+const increaseBlockIndentation = StateEffect.define<number>();
+const decreaseBlockIndentation = StateEffect.define<number>();
 
-function indentationDecorator(view: EditorView) {
-  const step = view.state.facet(stepSize);
-  const builder = new RangeSetBuilder<Decoration>();
-  for (const { from, to } of view.visibleRanges) {
-    for (let pos = from; pos <= to; ) {
-      let line = view.state.doc.lineAt(pos);
-      if (line.number % step === 0) {
-        builder.add(line.from, line.from, indendationDecoration);
+const blockIndentationField = StateField.define<DecorationSet>({
+  create() {
+    return Decoration.none;
+  },
+  update(indentations, transaction) {
+    indentations = indentations.map(transaction.changes);
+    for (const effect of transaction.effects) {
+      if (effect.is(increaseBlockIndentation)) {
+        console.log("increase block indentation for line", effect.value);
+        indentations = indentations.update({
+          add: [blockIndendationDecoration.range(effect.value)],
+        });
       }
-      pos = line.to + 1;
+      if (effect.is(decreaseBlockIndentation)) {
+        console.log("decrease block indentation for line", effect.value);
+        indentations = indentations.update({
+          filter: (from) => from !== effect.value,
+        });
+      }
     }
+    return indentations;
+  },
+  provide: (f) => EditorView.decorations.from(f),
+});
+
+export function indentBlock(view: EditorView) {
+  let effects: StateEffect<unknown>[] = view.state.selection.ranges.map(
+    (range) =>
+      increaseBlockIndentation.of(view.state.doc.lineAt(range.from).from)
+  );
+  if (!effects.length) return false;
+  if (!view.state.field(blockIndentationField, false)) {
+    effects.push(
+      StateEffect.appendConfig.of([blockIndentationField, baseTheme])
+    );
   }
-  return builder.finish();
+  view.dispatch({ effects });
+
+  return true;
 }
 
-const showIndentations = ViewPlugin.fromClass(
-  class {
-    decorations: DecorationSet;
-    constructor(view: EditorView) {
-      this.decorations = indentationDecorator(view);
-    }
-    update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged) {
-        this.decorations = indentationDecorator(update.view);
-      }
-    }
-  },
-  { decorations: (v) => v.decorations }
-);
+export function unindentBlock(view: EditorView) {
+  let effects: StateEffect<unknown>[] = view.state.selection.ranges.map(
+    (range) =>
+      decreaseBlockIndentation.of(view.state.doc.lineAt(range.from).from)
+  );
+  if (!effects.length) return false;
+  if (!view.state.field(blockIndentationField, false)) {
+    effects.push(
+      StateEffect.appendConfig.of([blockIndentationField, baseTheme])
+    );
+  }
+  view.dispatch({ effects });
+  return true;
+}
 
 const indendationKeymap = keymap.of([
   {
-    key: "tab",
+    key: "Tab",
     preventDefault: true,
-    run: () => {
-      console.log("tab");
+    run: (view: EditorView) => {
+      console.log("Tab");
+      indentBlock(view);
       return true;
     },
-  },
-  {
-    key: "tab",
-    shift: () => {
-      console.log("Shift-tab");
-      return true;
-    },
-    preventDefault: true,
-    run: () => {
-      console.log("tab");
+    shift: (view: EditorView) => {
+      console.log("Shift-Tab");
+      unindentBlock(view);
       return true;
     },
   },
 ]);
 
-export function indendationExtension(
-  options: { step?: number } = {}
-): Extension {
-  return [
-    baseTheme,
-    !options.step ? [] : stepSize.of(options.step),
-    showIndentations,
-    indendationKeymap,
-  ];
+export function blockIndentationExtension(_options: {} = {}): Extension {
+  return [baseTheme, indendationKeymap];
 }
 
 const initialState = EditorState.create({
-  doc: "",
-  extensions: [vim(), indendationExtension(), basicSetup],
+  doc: [
+    "Indent block with Tab",
+    "and use Shift-Tab to decrease the block indentation",
+  ].join("\n"),
+  extensions: [
+    //vim(),
+    blockIndentationExtension(),
+    basicSetup,
+  ],
 });
 const view = new EditorView({
   parent: document.getElementById("editor") ?? undefined,

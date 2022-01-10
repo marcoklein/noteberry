@@ -2,4 +2,5 @@
 
 ## 0.1.0
 
-Initial version.
+- Basic indentation with Tab and Shift-Tab
+- Initial version

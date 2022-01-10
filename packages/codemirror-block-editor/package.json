@@ -1,5 +1,5 @@
 {
-  "name": "codemirror6-indentation",
+  "name": "codemirror6-block-indentation",
   "description": "Playground project for code mirror 6.",
   "keywords": [
     "CodeMirror6",
@@ -12,14 +12,14 @@
   },
   "license": "MIT",
   "type": "module",
-  "exports": "./src/index.js",
+  "exports": "./dist/index.js",
   "engines": {
     "node": "^12.20.0 || ^14.13.1 || >=16.0.0"
   },
   "scripts": {
     "start": "parcel src/index.html",
     "build": "parcel build src/index.html",
-    "deploy": "gh-pages ./dist",
+    "deploy": "yarn build && gh-pages ./dist",
     "test": "mocha --loader=ts-node/esm src/**/*.spec.ts"
   },
   "devDependencies": {
