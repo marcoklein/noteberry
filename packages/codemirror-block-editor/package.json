@@ -2,7 +2,7 @@
   "name": "codemirror6-block-indentation",
   "description": "Playground project for code mirror 6.",
   "keywords": [
-    "CodeMirror6",
+    "code-mirror-6",
     "TypeScript",
     "ESM"
   ],
