@@ -1,8 +1,7 @@
 import { basicSetup, EditorState, EditorView } from "@codemirror/basic-setup";
 import { vim } from "@replit/codemirror-vim";
-import { blockExtension } from "./block-extension";
-
-console.log("starting");
+import { blockLevelDecorationExtension } from "./block-level-decoration-extension";
+import { blockLevelExtension } from "./block-level-extension";
 
 const initialState = EditorState.create({
   doc: [
@@ -13,7 +12,12 @@ const initialState = EditorState.create({
     "itemC",
     "itemD",
   ].join("\n"),
-  extensions: [vim(), blockExtension(), basicSetup],
+  extensions: [
+    vim(),
+    blockLevelExtension(),
+    blockLevelDecorationExtension(),
+    basicSetup,
+  ],
 });
 const view = new EditorView({
   parent: document.getElementById("editor") ?? undefined,

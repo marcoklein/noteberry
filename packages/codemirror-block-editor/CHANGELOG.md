@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.0
+
+- Using transaction filters with new indentation approach
+
 ## 0.1.0
 
 - Basic indentation with Tab and Shift-Tab
