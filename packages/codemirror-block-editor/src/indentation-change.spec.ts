@@ -1,52 +1,7 @@
-import { expect } from "chai";
-import { Text } from "@codemirror/text";
-import {
-  ChangeSpec,
-  TransactionSpec,
-  Transaction,
-  StateEffect,
-} from "@codemirror/state";
 import { EditorState } from "@codemirror/basic-setup";
-import {
-  findLevelOfLine,
-  getIntersectionAmount,
-  setBlockLevelEffect,
-} from "./block-extension.js";
-
-function applyTextChangeToContent(
-  transaction: Transaction,
-  levelOfLine: (line: number) => number
-): Transaction {
-  const effects: StateEffect<unknown>[] = [];
-  const changes: ChangeSpec[] = [];
-  const { startState, newDoc } = transaction;
-  const { doc: startDoc } = startState;
-
-  transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
-    const fromLine = startDoc.lineAt(toA);
-    const fromLineNumber = fromLine.number;
-    const fromLevel = levelOfLine(fromLineNumber);
-
-    const intersection = fromLine.from + fromLevel - fromA;
-    if (intersection > 0 && intersection <= fromLevel) {
-      const characterLength = 1;
-      changes.push({
-        from: fromA + characterLength,
-        to: fromA + characterLength + intersection,
-      });
-      effects.push(
-        setBlockLevelEffect.of({
-          changeText: false,
-          fromLevel: fromLevel,
-          toLevel: fromLevel - intersection,
-          lineNumber: fromLineNumber,
-        })
-      );
-    }
-  });
-
-  return transaction.state.update({ changes, effects });
-}
+import { expect } from "chai";
+import { applyTextChangeToContent } from "./apply-text-change.js";
+import { setBlockLevelEffect } from "./block-extension.js";
 
 describe("Block Level Changes", () => {
   let state: EditorState;
@@ -182,6 +137,97 @@ describe("Block Level Changes", () => {
         result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
       ).to.deep.include(
         { fromLevel: 3, toLevel: 1, lineNumber: 4 },
+        "effect does not return the correct level"
+      );
+    });
+  });
+
+  describe("Line Breaks", () => {
+    const content = ["A", "-B", "--C", "---D"].join("\n");
+    const insertText = "X";
+    const lineLevelMapping: { [line: number]: number } = {
+      1: 0,
+      2: 1,
+      3: 2,
+      4: 3,
+    };
+    beforeEach(() => {
+      state = EditorState.create({ doc: content });
+    });
+
+    it("should handle a line deletion", () => {
+      // given
+      const transaction = state.update({
+        changes: { from: 1, to: 2 },
+      });
+      // when
+      const result = applyTextChangeToContent(
+        transaction,
+        (line) => lineLevelMapping[line]
+      );
+      // then
+      expect(result.newDoc.toJSON()).to.deep.equal(["AB", "--C", "---D"]);
+      expect(result.effects).to.have.lengthOf(1);
+      expect(
+        result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
+      ).to.deep.include(
+        { fromLevel: 1, toLevel: -1, lineNumber: 2 },
+        "effect does not return the correct level"
+      );
+    });
+
+    it("should handle a line deletion with multiple levels", () => {
+      // given
+      const transaction = state.update({
+        changes: { from: 8, to: 9 },
+      });
+      // when
+      const result = applyTextChangeToContent(
+        transaction,
+        (line) => lineLevelMapping[line]
+      );
+      // then
+      expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", "--CD"]);
+      expect(result.effects).to.have.lengthOf(1);
+      expect(
+        result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
+      ).to.deep.include(
+        { fromLevel: 3, toLevel: -1, lineNumber: 4 },
+        "effect does not return the correct level"
+      );
+    });
+  });
+
+  xdescribe("Range Changes", () => {
+    const content = ["A", "-B", "--C", "---D"].join("\n");
+    const insertText = "X";
+    const lineLevelMapping: { [line: number]: number } = {
+      1: 0,
+      2: 1,
+      3: 2,
+      4: 3,
+    };
+    beforeEach(() => {
+      state = EditorState.create({ doc: content });
+    });
+
+    it("should handle deletion of a range", () => {
+      // given
+      const transaction = state.update({
+        changes: { from: 1, to: 5 },
+      });
+      // when
+      const result = applyTextChangeToContent(
+        transaction,
+        (line) => lineLevelMapping[line]
+      );
+      // then
+      expect(result.newDoc.toJSON()).to.deep.equal(["AB", "--C", "---D"]);
+      expect(result.effects).to.have.lengthOf(1);
+      expect(
+        result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
+      ).to.deep.include(
+        { fromLevel: 1, toLevel: -1, lineNumber: 2 },
         "effect does not return the correct level"
       );
     });
