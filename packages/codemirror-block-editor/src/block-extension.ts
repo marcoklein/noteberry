@@ -163,7 +163,7 @@ const applyBlockLevelIndentationChanges = EditorState.transactionFilter.of(
   }
 );
 
-function getIntersectionAmount(
+export function getIntersectionAmount(
   rootFrom: number,
   rootTo: number,
   otherFrom: number,
