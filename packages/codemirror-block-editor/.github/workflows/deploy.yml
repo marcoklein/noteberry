@@ -25,6 +25,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
       - run: yarn install --frozen-lockfile
+      - run: yarn build
+      - run: yarn test
       - name: Publish to GitHub Pages
         run: |
           git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/marcoklein/codemirror6-block-indentation.git
