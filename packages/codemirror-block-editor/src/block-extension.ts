@@ -6,11 +6,13 @@ import {
   StateField,
 } from "@codemirror/state";
 import { keymap, ViewPlugin, ViewUpdate } from "@codemirror/view";
+import { invertedEffects } from "@codemirror/history";
 
 export type SetBlockLevelEffectSpec = {
   lineNumber: number;
   fromLevel: number;
   toLevel: number;
+  changeText: boolean;
 };
 export const setBlockLevelEffect =
   StateEffect.define<SetBlockLevelEffectSpec>();
@@ -79,7 +81,7 @@ export const findLevelOfLine = (state: EditorState, lineNumber: number) => {
   return mappings[lineNumber] ?? 0;
 };
 
-const reduceInputBlockEffects = EditorState.transactionFilter.of(
+const mapInputBlockEffectsToSetBlockEffects = EditorState.transactionFilter.of(
   (transaction) => {
     const { state } = transaction;
     const effects: StateEffect<unknown>[] = [];
@@ -111,7 +113,12 @@ const reduceInputBlockEffects = EditorState.transactionFilter.of(
           // decrease
         }
         effects.push(
-          setBlockLevelEffect.of({ fromLevel, toLevel, lineNumber })
+          setBlockLevelEffect.of({
+            fromLevel,
+            toLevel,
+            lineNumber,
+            changeText: true,
+          })
         );
       }
     }
@@ -123,46 +130,154 @@ const reduceInputBlockEffects = EditorState.transactionFilter.of(
   }
 );
 
-const indentBlockLevels = EditorState.transactionFilter.of((transaction) => {
-  const { state, newDoc } = transaction;
-  let changes: ChangeSpec[] = [];
-  for (const effect of transaction.effects) {
-    if (effect.is(setBlockLevelEffect)) {
-      const { lineNumber, fromLevel, toLevel } = effect.value;
-      const levelDiff = toLevel - fromLevel;
-      const line = newDoc.line(lineNumber);
-      console.log("block effect", effect.value);
+const applyBlockLevelIndentationChanges = EditorState.transactionFilter.of(
+  (transaction) => {
+    const { state, newDoc } = transaction;
+    let changes: ChangeSpec[] = [];
+    for (const effect of transaction.effects) {
+      if (effect.is(setBlockLevelEffect) && effect.value.changeText) {
+        const { lineNumber, fromLevel, toLevel } = effect.value;
+        const levelDiff = toLevel - fromLevel;
+        const line = newDoc.line(lineNumber);
+        console.log("block effect", effect.value);
 
-      if (toLevel < fromLevel) {
-        changes.push({
-          from: line.from + toLevel,
-          to: line.from + fromLevel,
-        });
-      } else {
-        changes.push({
-          from: line.from,
-          to: line.from,
-          insert: "-".repeat(levelDiff),
-        });
+        if (toLevel < fromLevel) {
+          changes.push({
+            from: line.from + toLevel,
+            to: line.from + fromLevel,
+          });
+        } else {
+          changes.push({
+            from: line.from,
+            to: line.from,
+            insert: "-".repeat(levelDiff),
+          });
+        }
+        console.log(transaction);
       }
-      console.log(transaction);
     }
-  }
 
-  return changes.length
-    ? [transaction, { changes, sequential: true }]
-    : transaction;
-});
+    return changes.length
+      ? [transaction, { changes, sequential: true }]
+      : transaction;
+  }
+);
+
+function getIntersectionAmount(
+  rootFrom: number,
+  rootTo: number,
+  otherFrom: number,
+  otherTo: number
+) {
+  if (otherTo < rootFrom || rootTo < otherTo) return 0;
+  if (otherFrom < rootFrom && rootTo < otherTo) return rootTo - rootFrom;
+  if (otherFrom < rootFrom) return rootTo - rootFrom - otherTo - rootFrom;
+  if (otherTo < rootTo) return rootTo - rootFrom - rootTo - otherFrom;
+  return otherTo - otherFrom;
+}
+
+const detectBlockLevelChangesByTextChanges = EditorState.transactionFilter.of(
+  (transaction) => {
+    const { startState, state, changes, newDoc } = transaction;
+    const startDoc = startState.doc;
+    const effects: StateEffect<unknown>[] = [];
+    changes.iterChanges((fromA, toA, fromB, toB, text) => {
+      const fromLine = startDoc.lineAt(toA);
+      const fromLineNumber = fromLine.number;
+      const toLineNumber = newDoc.lineAt(toB).number;
+      const fromLevel = findLevelOfLine(startState, fromLineNumber);
+      console.log("lines", fromLineNumber, toLineNumber);
+      if (text.lines > 1) console.log("new line!", toLineNumber);
+      if (fromLineNumber > toLineNumber) {
+        // TODO delete all line in-between
+        console.log("deleted line ", fromLineNumber, " with level ", fromLevel);
+        effects.push(
+          setBlockLevelEffect.of({
+            fromLevel,
+            toLevel: 0,
+            lineNumber: fromLineNumber,
+            changeText: false,
+          })
+        );
+      }
+      const lineLevelIndentationRange = {
+        from: fromLine.from,
+        to: fromLine.from + fromLevel,
+      };
+      const intersectionAmount = getIntersectionAmount(
+        lineLevelIndentationRange.from,
+        lineLevelIndentationRange.to,
+        fromA,
+        toA
+      );
+      console.log("intersection amount", intersectionAmount);
+      // check if change is within a block level indentation
+      if (intersectionAmount > 0) {
+        const toLevel = fromLevel - intersectionAmount;
+        console.log("reducing level to ", toLevel);
+        effects.push(
+          setBlockLevelEffect.of({
+            fromLevel,
+            toLevel,
+            lineNumber: fromLineNumber,
+            changeText: false,
+          })
+        );
+      }
+    });
+    return effects.length ? [transaction, { effects }] : transaction;
+  }
+);
+
+const protectBlockLevelIndentationsFromChanges = EditorState.changeFilter.of(
+  (transaction) => {
+    const { startState, state, changes, newDoc } = transaction;
+    const startDoc = startState.doc;
+    // TODO only check for changed lines
+    const result: number[] = [];
+    for (let i = 1; i <= state.doc.lines; i++) {
+      const level = findLevelOfLine(state, i);
+      const line = state.doc.line(i);
+      // TODO multiply level by level separator length
+      result.push(line.from, line.from + level);
+    }
+    return result;
+  }
+);
 
 export function blockExtension(_options: {} = {}): Extension {
   return [
-    blocksMapField,
     indendationKeymap,
-    reduceInputBlockEffects,
-    indentBlockLevels,
-    // EditorState.transactionFilter.of((transaction) => {
-    //   const { effects, changes } = transaction;
-    //   return [transaction];
+    mapInputBlockEffectsToSetBlockEffects,
+    applyBlockLevelIndentationChanges,
+    detectBlockLevelChangesByTextChanges,
+    blocksMapField,
+    // protectBlockLevelIndentationsFromChanges,
+    // invertedEffects.of((tr) => {
+    //   console.log("inverting effects");
+    //   return [];
+    // }),
+    // TODO adjust history
+    // invertedEffects.of((tr) => {
+    //   const effects: StateEffect<unknown>[] = [];
+    //   const decorations = tr.state.field(blockLevelDecorationsField);
+    //   for (const effect of tr.effects) {
+    //     if (effect.is(setBlockLevelEffect)) {
+    //       // TODO store currentLevel in effect!
+    //       const curLevel = findLevelOfLine(
+    //         decorations,
+    //         tr.newDoc.line(effect.value.lineNumber)
+    //       );
+    //       effects.push(
+    //         setBlockLevelEffect.of({
+    //           level: curLevel,
+    //           lineNumber: effect.value.lineNumber,
+    //         })
+    //       );
+    //     }
+    //   }
+    //   console.log("adding inverted effecs", effects);
+    //   return effects;
     // }),
   ];
 }
