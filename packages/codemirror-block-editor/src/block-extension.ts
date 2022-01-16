@@ -7,15 +7,12 @@ import {
 } from "@codemirror/state";
 import { keymap, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { invertedEffects } from "@codemirror/history";
-
-export type SetBlockLevelEffectSpec = {
-  lineNumber: number;
-  fromLevel: number;
-  toLevel: number;
-  changeText: boolean;
-};
-export const setBlockLevelEffect =
-  StateEffect.define<SetBlockLevelEffectSpec>();
+import { applyTextChangeToContent } from "./apply-text-change";
+import {
+  findBlockLevelOfLine,
+  setBlockLevelEffect,
+  lineBlockLevelMapField,
+} from "./line-block-level-map-field";
 
 export const inputIncreaseBlockLevelEffect = StateEffect.define<number>();
 export const inputDecreaseBlockLevelEffect = StateEffect.define<number>();
@@ -58,29 +55,6 @@ const indendationKeymap = keymap.of([
   },
 ]);
 
-export const blocksMapField = StateField.define<{
-  [lineNumber: number]: number;
-}>({
-  create(state) {
-    return {};
-  },
-  update(blocksMapField, transaction) {
-    for (const effect of transaction.effects) {
-      if (effect.is(setBlockLevelEffect)) {
-        const { lineNumber, fromLevel, toLevel } = effect.value;
-        blocksMapField = Object.assign({}, blocksMapField);
-        blocksMapField[lineNumber] = toLevel;
-      }
-    }
-    return blocksMapField;
-  },
-});
-
-export const findLevelOfLine = (state: EditorState, lineNumber: number) => {
-  const mappings = state.field(blocksMapField, false) || {};
-  return mappings[lineNumber] ?? 0;
-};
-
 const mapInputBlockEffectsToSetBlockEffects = EditorState.transactionFilter.of(
   (transaction) => {
     const { state } = transaction;
@@ -89,7 +63,7 @@ const mapInputBlockEffectsToSetBlockEffects = EditorState.transactionFilter.of(
       const isIncreaseEffect = effect.is(inputIncreaseBlockLevelEffect);
       if (isIncreaseEffect || effect.is(inputDecreaseBlockLevelEffect)) {
         const lineNumber = effect.value;
-        const fromLevel = findLevelOfLine(state, lineNumber);
+        const fromLevel = findBlockLevelOfLine(state, lineNumber);
         const toLevel = Math.max(
           0,
           isIncreaseEffect ? fromLevel + 1 : fromLevel - 1
@@ -103,7 +77,7 @@ const mapInputBlockEffectsToSetBlockEffects = EditorState.transactionFilter.of(
           continue;
         }
         if (isIncreaseEffect) {
-          const previousLevel = findLevelOfLine(state, lineNumber - 1);
+          const previousLevel = findBlockLevelOfLine(state, lineNumber - 1);
           if (toLevel > previousLevel + 1) {
             // only 1 level jumps
             console.log("only level jumps of 1 are allowed");
@@ -185,7 +159,7 @@ const detectBlockLevelChangesByTextChanges = EditorState.transactionFilter.of(
       const fromLine = startDoc.lineAt(toA);
       const fromLineNumber = fromLine.number;
       const toLineNumber = newDoc.lineAt(toB).number;
-      const fromLevel = findLevelOfLine(startState, fromLineNumber);
+      const fromLevel = findBlockLevelOfLine(startState, fromLineNumber);
       console.log("lines", fromLineNumber, toLineNumber);
       if (text.lines > 1) console.log("new line!", toLineNumber);
       if (fromLineNumber > toLineNumber) {
@@ -236,7 +210,7 @@ const protectBlockLevelIndentationsFromChanges = EditorState.changeFilter.of(
     // TODO only check for changed lines
     const result: number[] = [];
     for (let i = 1; i <= state.doc.lines; i++) {
-      const level = findLevelOfLine(state, i);
+      const level = findBlockLevelOfLine(state, i);
       const line = state.doc.line(i);
       // TODO multiply level by level separator length
       result.push(line.from, line.from + level);
@@ -250,8 +224,15 @@ export function blockExtension(_options: {} = {}): Extension {
     indendationKeymap,
     mapInputBlockEffectsToSetBlockEffects,
     applyBlockLevelIndentationChanges,
-    detectBlockLevelChangesByTextChanges,
-    blocksMapField,
+    // detectBlockLevelChangesByTextChanges,
+    EditorState.transactionFilter.of((transaction) => {
+      return [
+        ...applyTextChangeToContent(transaction, (line) =>
+          findBlockLevelOfLine(transaction.state, line)
+        ),
+      ];
+    }),
+    lineBlockLevelMapField,
     // protectBlockLevelIndentationsFromChanges,
     // invertedEffects.of((tr) => {
     //   console.log("inverting effects");

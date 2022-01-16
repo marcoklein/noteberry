@@ -1,12 +1,12 @@
 import { EditorState } from "@codemirror/basic-setup";
 import { expect } from "chai";
 import { applyTextChangeToContent } from "./apply-text-change.js";
-import { setBlockLevelEffect } from "./block-extension.js";
+import { setBlockLevelEffect } from "./line-block-level-map-field.js";
 
 describe("Block Level Changes", () => {
   let state: EditorState;
 
-  describe("Adding Single Character", () => {
+  describe("Single Characters", () => {
     // given
     const content = ["A", "-B"].join("\n");
     const insertText = "C";
@@ -26,7 +26,10 @@ describe("Block Level Changes", () => {
         (line) => lineLevelMapping[line]
       );
       // then
-      expect(result.newDoc.toJSON()).to.deep.equal(["AC", "-B"]);
+      expect(state.update(...result).newDoc.toJSON()).to.deep.equal([
+        "AC",
+        "-B",
+      ]);
     });
 
     it("should add character after block level indentation", () => {
@@ -35,9 +38,11 @@ describe("Block Level Changes", () => {
         changes: { from: 3, insert: insertText },
       });
       // when
-      const result = applyTextChangeToContent(
-        transaction,
-        (line) => lineLevelMapping[line]
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
       );
       // then
       expect(result.newDoc.toJSON()).to.deep.equal(["A", "-CB"]);
@@ -50,12 +55,38 @@ describe("Block Level Changes", () => {
         changes: { from: 2, insert: insertText },
       });
       // when
-      const result = applyTextChangeToContent(
-        transaction,
-        (line) => lineLevelMapping[line]
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
       );
       // then
-      expect(result.newDoc.toJSON()).to.deep.equal(["A", "CB"]);
+      expect(state.update(result).newDoc.toJSON()).to.deep.equal(["A", "CB"]);
+      expect(result.effects).to.have.lengthOf(
+        1,
+        "should set block level effect"
+      );
+      expect(
+        result.effects[0].is(setBlockLevelEffect) &&
+          result.effects[0].value.toLevel
+      ).to.equal(0, "effect does not return the correct level");
+    });
+
+    it("should delete the block level character", () => {
+      // given
+      const transaction = state.update({
+        changes: { from: 2, to: 3 },
+      });
+      // when
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
+      );
+      // then
+      expect(state.update(result).newDoc.toJSON()).to.deep.equal(["A", "B"]);
       expect(result.effects).to.have.lengthOf(
         1,
         "should set block level effect"
@@ -86,9 +117,11 @@ describe("Block Level Changes", () => {
         changes: { from: 5, insert: insertText },
       });
       // when
-      const result = applyTextChangeToContent(
-        transaction,
-        (line) => lineLevelMapping[line]
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
       );
       // then
       expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", "FC", "---D"]);
@@ -105,9 +138,11 @@ describe("Block Level Changes", () => {
         changes: { from: 6, insert: insertText },
       });
       // when
-      const result = applyTextChangeToContent(
-        transaction,
-        (line) => lineLevelMapping[line]
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
       );
       // then
       expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", "-FC", "---D"]);
@@ -126,9 +161,11 @@ describe("Block Level Changes", () => {
         changes: { from: 10, insert: insertText },
       });
       // when
-      const result = applyTextChangeToContent(
-        transaction,
-        (line) => lineLevelMapping[line]
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
       );
       // then
       expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", "--C", "-FD"]);
@@ -161,9 +198,11 @@ describe("Block Level Changes", () => {
         changes: { from: 1, to: 2 },
       });
       // when
-      const result = applyTextChangeToContent(
-        transaction,
-        (line) => lineLevelMapping[line]
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
       );
       // then
       expect(result.newDoc.toJSON()).to.deep.equal(["AB", "--C", "---D"]);
@@ -182,9 +221,11 @@ describe("Block Level Changes", () => {
         changes: { from: 8, to: 9 },
       });
       // when
-      const result = applyTextChangeToContent(
-        transaction,
-        (line) => lineLevelMapping[line]
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
       );
       // then
       expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", "--CD"]);
@@ -198,7 +239,7 @@ describe("Block Level Changes", () => {
     });
   });
 
-  xdescribe("Range Changes", () => {
+  describe("Range Changes", () => {
     const content = ["A", "-B", "--C", "---D"].join("\n");
     const insertText = "X";
     const lineLevelMapping: { [line: number]: number } = {
@@ -211,18 +252,43 @@ describe("Block Level Changes", () => {
       state = EditorState.create({ doc: content });
     });
 
-    it("should handle deletion of a range", () => {
+    xit("should handle deletion of a complete level with text", () => {
+      // given
+      const transaction = state.update({
+        changes: { from: 5, to: 8 },
+      });
+      // when
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
+      );
+      // then
+      expect(result.newDoc.toJSON()).to.deep.equal(["AC", "---D"]);
+      expect(result.effects).to.have.lengthOf(1);
+      expect(
+        result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
+      ).to.deep.include(
+        { fromLevel: 1, toLevel: -1, lineNumber: 2 },
+        "effect does not return the correct level"
+      );
+    });
+
+    xit("should handle deletion of a range", () => {
       // given
       const transaction = state.update({
         changes: { from: 1, to: 5 },
       });
       // when
-      const result = applyTextChangeToContent(
-        transaction,
-        (line) => lineLevelMapping[line]
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
       );
       // then
-      expect(result.newDoc.toJSON()).to.deep.equal(["AB", "--C", "---D"]);
+      expect(result.newDoc.toJSON()).to.deep.equal(["AC", "---D"]);
       expect(result.effects).to.have.lengthOf(1);
       expect(
         result.effects[0].is(setBlockLevelEffect) && result.effects[0].value

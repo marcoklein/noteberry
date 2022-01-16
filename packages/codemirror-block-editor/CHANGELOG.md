@@ -3,6 +3,7 @@
 ## 0.2.0
 
 - Using transaction filters with new indentation approach
+- Handle character changes
 
 ## 0.1.0
 
