@@ -44,7 +44,6 @@ export function applyTextChangeToContent(
     lineFrom: number,
     lineLevel: number,
     lineChangeFrom: number,
-    lineChangeTo: number,
     characterLength: number
   ) => {
     const levelIntersection = Math.min(lineLevel, lineLevel - lineChangeFrom);
@@ -56,11 +55,7 @@ export function applyTextChangeToContent(
         });
         lineLevelChanged(lineNumber, lineLevel, lineLevel - levelIntersection);
       } else {
-        lineLevelChanged(
-          lineNumber,
-          lineLevel,
-          lineLevel - (lineChangeTo - lineChangeFrom) - characterLength
-        );
+        lineLevelChanged(lineNumber, lineLevel, lineLevel - levelIntersection);
       }
     }
   };
@@ -106,7 +101,6 @@ export function applyTextChangeToContent(
         fromLine.from,
         fromLevel,
         fromA - fromLine.from,
-        toA - fromLine.from,
         characterLength
       );
     }

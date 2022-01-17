@@ -240,7 +240,7 @@ describe("Block Level Changes", () => {
   });
 
   describe("Range Changes", () => {
-    const content = ["A", "-B", "--C"].join("\n");
+    const content = ["A", "-B", "--CD"].join("\n");
     const insertText = "X";
     const lineLevelMapping: { [line: number]: number } = {
       1: 0,
@@ -254,7 +254,7 @@ describe("Block Level Changes", () => {
     it("should handle deletion of a complete level with text", () => {
       // given
       const transaction = state.update({
-        changes: { from: 5, to: 8 },
+        changes: { from: 5, to: 9 },
       });
       // when
       const result = state.update(
@@ -269,12 +269,12 @@ describe("Block Level Changes", () => {
       expect(
         result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
       ).to.deep.include(
-        { fromLevel: 2, toLevel: -1, lineNumber: 3 },
+        { fromLevel: 2, toLevel: 0, lineNumber: 3 },
         "effect does not return the correct level"
       );
     });
 
-    it("should handle deletion of a complete level with text", () => {
+    it("should handle deletion of a complete level with some text", () => {
       // given
       const transaction = state.update({
         changes: { from: 5, to: 8 },
@@ -287,12 +287,35 @@ describe("Block Level Changes", () => {
         )
       );
       // then
-      expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", ""]);
+      expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", "D"]);
       expect(result.effects).to.have.lengthOf(1);
       expect(
         result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
       ).to.deep.include(
-        { fromLevel: 2, toLevel: -1, lineNumber: 3 },
+        { fromLevel: 2, toLevel: 0, lineNumber: 3 },
+        "effect does not return the correct level"
+      );
+    });
+
+    it("should handle deletion of some level with some text", () => {
+      // given
+      const transaction = state.update({
+        changes: { from: 6, to: 8 },
+      });
+      // when
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
+      );
+      // then
+      expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", "-D"]);
+      expect(result.effects).to.have.lengthOf(1);
+      expect(
+        result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
+      ).to.deep.include(
+        { fromLevel: 2, toLevel: 1, lineNumber: 3 },
         "effect does not return the correct level"
       );
     });
