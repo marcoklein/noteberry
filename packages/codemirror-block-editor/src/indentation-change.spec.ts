@@ -240,19 +240,18 @@ describe("Block Level Changes", () => {
   });
 
   describe("Range Changes", () => {
-    const content = ["A", "-B", "--C", "---D"].join("\n");
+    const content = ["A", "-B", "--C"].join("\n");
     const insertText = "X";
     const lineLevelMapping: { [line: number]: number } = {
       1: 0,
       2: 1,
       3: 2,
-      4: 3,
     };
     beforeEach(() => {
       state = EditorState.create({ doc: content });
     });
 
-    xit("should handle deletion of a complete level with text", () => {
+    it("should handle deletion of a complete level with text", () => {
       // given
       const transaction = state.update({
         changes: { from: 5, to: 8 },
@@ -265,20 +264,20 @@ describe("Block Level Changes", () => {
         )
       );
       // then
-      expect(result.newDoc.toJSON()).to.deep.equal(["AC", "---D"]);
+      expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", ""]);
       expect(result.effects).to.have.lengthOf(1);
       expect(
         result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
       ).to.deep.include(
-        { fromLevel: 1, toLevel: -1, lineNumber: 2 },
+        { fromLevel: 2, toLevel: -1, lineNumber: 3 },
         "effect does not return the correct level"
       );
     });
 
-    xit("should handle deletion of a range", () => {
+    it("should handle deletion of a complete level with text", () => {
       // given
       const transaction = state.update({
-        changes: { from: 1, to: 5 },
+        changes: { from: 5, to: 8 },
       });
       // when
       const result = state.update(
@@ -288,12 +287,59 @@ describe("Block Level Changes", () => {
         )
       );
       // then
-      expect(result.newDoc.toJSON()).to.deep.equal(["AC", "---D"]);
+      expect(result.newDoc.toJSON()).to.deep.equal(["A", "-B", ""]);
       expect(result.effects).to.have.lengthOf(1);
       expect(
         result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
       ).to.deep.include(
+        { fromLevel: 2, toLevel: -1, lineNumber: 3 },
+        "effect does not return the correct level"
+      );
+    });
+  });
+
+  describe("Multiline", () => {
+    const content = ["A", "-B", "--C"].join("\n");
+    const insertText = "X";
+    const lineLevelMapping: { [line: number]: number } = {
+      1: 0,
+      2: 1,
+      3: 2,
+    };
+    beforeEach(() => {
+      state = EditorState.create({ doc: content });
+    });
+    xit("should handle deletion of a multiline", () => {
+      // given
+      const transaction = state.update({
+        changes: { from: 0, to: 7 },
+      });
+      // when
+      const result = state.update(
+        ...applyTextChangeToContent(
+          transaction,
+          (line) => lineLevelMapping[line]
+        )
+      );
+      // then
+      expect(result.newDoc.toJSON()).to.deep.equal(["C"]);
+      expect(result.effects).to.have.lengthOf(3);
+      expect(
+        result.effects[0].is(setBlockLevelEffect) && result.effects[0].value
+      ).to.deep.include(
+        { fromLevel: 0, toLevel: -1, lineNumber: 1 },
+        "effect does not return the correct level"
+      );
+      expect(
+        result.effects[1].is(setBlockLevelEffect) && result.effects[0].value
+      ).to.deep.include(
         { fromLevel: 1, toLevel: -1, lineNumber: 2 },
+        "effect does not return the correct level"
+      );
+      expect(
+        result.effects[2].is(setBlockLevelEffect) && result.effects[0].value
+      ).to.deep.include(
+        { fromLevel: 2, toLevel: 2, lineNumber: 3 },
         "effect does not return the correct level"
       );
     });
