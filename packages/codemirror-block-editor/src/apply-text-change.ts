@@ -44,65 +44,93 @@ export function applyTextChangeToContent(
     lineFrom: number,
     lineLevel: number,
     lineChangeFrom: number,
+    lineChangeTo: number,
     characterLength: number
   ) => {
-    const levelIntersection = Math.min(lineLevel, lineLevel - lineChangeFrom);
-    if (levelIntersection > 0) {
-      if (characterLength > 0) {
+    const intersectingLevelsFrom = Math.min(
+      lineLevel,
+      lineLevel - lineChangeFrom
+    );
+    if (intersectingLevelsFrom > 0) {
+      const deletedChars = Math.max(
+        0,
+        // TODO you can max delete the intersectingLevelsFrom
+        lineChangeTo - lineChangeFrom - characterLength
+      );
+      const insertedChars = Math.max(
+        0,
+        characterLength - (lineChangeTo - lineChangeFrom)
+      );
+      const replacedChars = Math.min(
+        lineChangeTo - lineChangeFrom,
+        characterLength
+      );
+      console.log(deletedChars, insertedChars, replacedChars);
+      const remainingLevelCharactersToDelete =
+        intersectingLevelsFrom - replacedChars - deletedChars;
+      if (remainingLevelCharactersToDelete > 0) {
         changes.push({
-          from: lineFrom + lineChangeFrom + characterLength,
-          to: lineFrom + lineChangeFrom + characterLength + levelIntersection,
+          from:
+            lineFrom +
+            lineChangeFrom +
+            insertedChars +
+            replacedChars +
+            deletedChars,
+          to:
+            lineFrom +
+            lineChangeFrom +
+            insertedChars +
+            replacedChars +
+            remainingLevelCharactersToDelete,
         });
-        lineLevelChanged(lineNumber, lineLevel, lineLevel - levelIntersection);
-      } else {
-        lineLevelChanged(lineNumber, lineLevel, lineLevel - levelIntersection);
       }
+      lineLevelChanged(
+        lineNumber,
+        lineLevel,
+        lineLevel - intersectingLevelsFrom
+      );
     }
   };
 
   transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
-    if (text.lines === 1 && text.line(1).text === "-") {
-      console.log("skipping due to level indent");
-      return;
-    }
-    const fromLine = startDoc.lineAt(toA);
-    const fromLineNumber = fromLine.number;
-    const fromLevel = levelOfLine(fromLineNumber);
-    const toLine = startDoc.lineAt(toB);
-    const toLineNumber = toLine.number;
-    // const toLevel = levelOfLine(toLineNumber);
-
-    let characterLength = text.length;
+    console.log("changes", fromA, toA, fromB, toB);
     const newLineCharacterLength = 1;
-    const lineDiff = fromLineNumber - toLineNumber;
-    if (lineDiff > 0) {
-      console.log("deleting count of lines: ", lineDiff);
-      const startingLine = toLineNumber;
-      const endingLine = fromLineNumber;
+    const startingLine = startDoc.lineAt(fromA);
+    const endingLine = startDoc.lineAt(toA);
+    // starting line
+    handleLineIntersection(
+      startingLine.number,
+      startingLine.from,
+      levelOfLine(startingLine.number),
+      fromA - startingLine.from,
+      Math.min(toA - startingLine.from, startingLine.to),
+      text.line(1).length
+    );
+
+    if (startingLine.number !== endingLine.number) {
       for (
-        let currentLine = startingLine + 1;
-        currentLine < endingLine;
+        let currentLine = startingLine.number + 1;
+        currentLine <= endingLine.number;
         currentLine++
       ) {
-        console.log("deleting line within a range");
-        lineDeleted(currentLine, fromLevel);
+        lineDeleted(currentLine, levelOfLine(currentLine));
       }
-      endingLine;
 
-      changes.push({
-        from: fromLine.from - characterLength - newLineCharacterLength,
-        to:
-          fromLine.from - characterLength + fromLevel - newLineCharacterLength,
-      });
-      lineDeleted(fromLineNumber, fromLevel);
-    } else {
-      handleLineIntersection(
-        fromLineNumber,
-        fromLine.from,
-        fromLevel,
-        fromA - fromLine.from,
-        characterLength
-      );
+      // ending line
+      const endLineIntersection = toA - endingLine.from;
+      const remainingLevelIntersection =
+        levelOfLine(endingLine.number) - endLineIntersection;
+
+      if (remainingLevelIntersection > 0) {
+        changes.push({
+          from: endingLine.from + endLineIntersection - newLineCharacterLength,
+          to:
+            endingLine.from +
+            endLineIntersection +
+            remainingLevelIntersection -
+            newLineCharacterLength,
+        });
+      }
     }
   });
 
