@@ -13,6 +13,7 @@ import {
   setBlockLevelEffect,
   lineBlockLevelMapField,
 } from "./line-block-level-map-field";
+import { blockLevelDecorationsField } from "./block-level-decoration-extension";
 
 export const inputIncreaseBlockLevelEffect = StateEffect.define<number>();
 export const inputDecreaseBlockLevelEffect = StateEffect.define<number>();
@@ -232,6 +233,7 @@ export function blockExtension(_options: {} = {}): Extension {
         ),
       ];
     }),
+    blockLevelDecorationsField,
     lineBlockLevelMapField,
     // protectBlockLevelIndentationsFromChanges,
     // invertedEffects.of((tr) => {

@@ -2,6 +2,7 @@
 
 ## 0.2.0
 
+- Decoration of block level indentations
 - Using transaction filters with new indentation approach
 - Handle character changes
 
