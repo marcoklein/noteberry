@@ -1,19 +1,17 @@
 import { EditorState, EditorView } from "@codemirror/basic-setup";
-import {
-  ChangeSpec,
-  Extension,
-  StateEffect,
-  StateField,
-} from "@codemirror/state";
+import { ChangeSpec, Extension, StateEffect } from "@codemirror/state";
 import { keymap, ViewPlugin, ViewUpdate } from "@codemirror/view";
-import { invertedEffects } from "@codemirror/history";
 import { applyTextChangeToContent } from "./apply-text-change";
 import {
+  blockLevelDecorationsFacet,
+  blockLevelDecorationsField,
+  redTextDecoration,
+} from "./decorations/decorations-field";
+import {
   findBlockLevelOfLine,
-  setBlockLevelEffect,
   lineBlockLevelMapField,
+  setBlockLevelEffect,
 } from "./line-block-level-map-field";
-import { blockLevelDecorationsField } from "./block-level-decoration-extension";
 
 export const inputIncreaseBlockLevelEffect = StateEffect.define<number>();
 export const inputDecreaseBlockLevelEffect = StateEffect.define<number>();
@@ -233,6 +231,7 @@ export function blockExtension(_options: {} = {}): Extension {
         ),
       ];
     }),
+    blockLevelDecorationsFacet.of(() => redTextDecoration),
     blockLevelDecorationsField,
     lineBlockLevelMapField,
     // protectBlockLevelIndentationsFromChanges,

@@ -1137,10 +1137,10 @@
     chrome-trace-event "^1.0.2"
     nullthrows "^1.1.1"
 
-"@replit/codemirror-vim@^0.19.0-beta.6":
-  version "0.19.0-beta.6"
-  resolved "https://registry.yarnpkg.com/@replit/codemirror-vim/-/codemirror-vim-0.19.0-beta.6.tgz#a8dd0f91d596a1d6a5ed71014fd6a28bbbb767f9"
-  integrity sha512-qDLJlL0lqVwyI4t8kvZiAXO9XorzyhUO2r/pX7rFGntYNIKoY7KgCdBsQPRuYPmI48YM9zyTDkFhGXBd7fkG3A==
+"@replit/codemirror-vim@^0.19.0-beta.8":
+  version "0.19.0-beta.8"
+  resolved "https://registry.yarnpkg.com/@replit/codemirror-vim/-/codemirror-vim-0.19.0-beta.8.tgz#77e8595a91bba233511dbe7c8a864ea76d2b2f8a"
+  integrity sha512-Pw3YA1zIhvNflD3qwjoB2mS3OXfTzCpve/1feadAh7uo02LVm9mpheIXi2w+ojh1aoZRImUTZIcbwth/oSFDhw==
 
 "@sindresorhus/is@^0.14.0":
   version "0.14.0"
