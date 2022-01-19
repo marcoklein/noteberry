@@ -7,7 +7,7 @@ import {
   findBlockLevelOfLine,
   setBlockLevelEffect,
   SetBlockLevelEffectSpec,
-} from "../line-block-level-map-field";
+} from "./line-block-level-map-field";
 
 class DotWidget extends WidgetType {
   constructor(readonly level: number) {

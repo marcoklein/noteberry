@@ -37,11 +37,9 @@ export const lineBlockLevelMapField = StateField.define<number[]>({
     }
 
     if (deletions.length) {
-      console.log("before del", blocksMapField);
       deletions.forEach((lineNumber, deletionCount) => {
         blocksMapField.splice(lineNumber - deletionCount, 1);
       });
-      console.log("after del", blocksMapField);
     }
     return blocksMapField;
   },

@@ -2,7 +2,7 @@ import { EditorState } from "@codemirror/basic-setup";
 import { expect } from "chai";
 import { applyTextChangeToContent } from "./apply-text-change.js";
 import { setBlockLevelEffect } from "./line-block-level-map-field.js";
-import { SetBlockLevelEffectSpec } from "./playground/3/block-level-decoration-extension.js";
+import { SetBlockLevelEffectSpec } from "../playground/3/block-level-decoration-extension.js";
 
 describe("Block Level Changes", () => {
   let state: EditorState;

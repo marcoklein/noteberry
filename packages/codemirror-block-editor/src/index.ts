@@ -1,6 +1,6 @@
 import { basicSetup, EditorState, EditorView } from "@codemirror/basic-setup";
 import { vim } from "@replit/codemirror-vim";
-import { blockExtension } from "./block-extension";
+import { blockExtension } from "./block-extension/block-extension";
 
 console.log("starting");
 
@@ -13,7 +13,7 @@ const initialState = EditorState.create({
     "itemC",
     "itemD",
   ].join("\n"),
-  extensions: [vim(), blockExtension(), basicSetup],
+  extensions: [blockExtension(), vim(), basicSetup],
 });
 const view = new EditorView({
   parent: document.getElementById("editor") ?? undefined,

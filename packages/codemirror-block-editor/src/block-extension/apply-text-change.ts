@@ -1,10 +1,14 @@
+import { EditorState } from "@codemirror/basic-setup";
 import {
   ChangeSpec,
   StateEffect,
   Transaction,
   TransactionSpec,
 } from "@codemirror/state";
-import { setBlockLevelEffect } from "./line-block-level-map-field";
+import {
+  findBlockLevelOfLine,
+  setBlockLevelEffect,
+} from "./line-block-level-map-field";
 
 export function applyTextChangeToContent(
   transaction: Transaction,
@@ -136,3 +140,10 @@ export function applyTextChangeToContent(
 
   return [transaction, { changes, effects, sequential: true }];
 }
+
+export const detectBlockLevelChangesByTextChanges =
+  EditorState.transactionFilter.of((transaction) =>
+    applyTextChangeToContent(transaction, (line) =>
+      findBlockLevelOfLine(transaction.state, line)
+    )
+  );
