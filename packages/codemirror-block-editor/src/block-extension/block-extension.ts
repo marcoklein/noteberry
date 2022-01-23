@@ -23,6 +23,6 @@ export function blockExtension(_options: {} = {}): Extension {
     blockLevelDecorationsField,
     lineBlockLevelMapField,
     // blockLevelHistory,
-    Prec.low(moveCursorToBlockLevelIndentationEndExtension),
+    // Prec.low(moveCursorToBlockLevelIndentationEndExtension),
   ];
 }

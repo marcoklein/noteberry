@@ -5,6 +5,7 @@ import {
   Transaction,
   TransactionSpec,
 } from "@codemirror/state";
+import { Line } from "@codemirror/text";
 import {
   findBlockLevelOfLine,
   setBlockLevelEffect,
@@ -14,136 +15,201 @@ export function applyTextChangeToContent(
   transaction: Transaction,
   levelOfLine: (line: number) => number
 ): Array<Transaction | TransactionSpec> {
-  const effects: StateEffect<unknown>[] = [];
-  const changes: ChangeSpec[] = [];
-  const { startState, newDoc } = transaction;
+  const resultingEffects: StateEffect<unknown>[] = [];
+  const resultingChanges: ChangeSpec[] = [];
+  const { startState } = transaction;
   const { doc: startDoc } = startState;
 
-  const lineDeleted = (lineNumber: number, fromLevel: number) => {
-    effects.push(
-      setBlockLevelEffect.of({
-        fromLevel,
-        toLevel: -1,
-        lineNumber,
-        changeText: false,
-      })
-    );
-  };
-  const lineLevelChanged = (
-    lineNumber: number,
-    fromLevel: number,
-    toLevel: number
-  ) => {
-    effects.push(
-      setBlockLevelEffect.of({
-        changeText: false,
-        fromLevel,
-        toLevel,
-        lineNumber,
-      })
-    );
-  };
-  const handleLineIntersection = (
-    lineNumber: number,
-    lineFrom: number,
-    lineLevel: number,
-    lineChangeFrom: number,
-    lineChangeTo: number,
-    characterLength: number
-  ) => {
-    const intersectingLevelsFrom = Math.min(
-      lineLevel,
-      lineLevel - lineChangeFrom
-    );
-    if (intersectingLevelsFrom > 0) {
-      const deletedChars = Math.max(
-        0,
-        // TODO you can max delete the intersectingLevelsFrom
-        lineChangeTo - lineChangeFrom - characterLength
-      );
-      const insertedChars = Math.max(
-        0,
-        characterLength - (lineChangeTo - lineChangeFrom)
-      );
-      const replacedChars = Math.min(
-        lineChangeTo - lineChangeFrom,
-        characterLength
-      );
-      console.log(deletedChars, insertedChars, replacedChars);
-      const remainingLevelCharactersToDelete =
-        intersectingLevelsFrom - replacedChars - deletedChars;
-      if (remainingLevelCharactersToDelete > 0) {
-        changes.push({
-          from:
-            lineFrom +
-            lineChangeFrom +
-            insertedChars +
-            replacedChars +
-            deletedChars,
-          to:
-            lineFrom +
-            lineChangeFrom +
-            insertedChars +
-            replacedChars +
-            remainingLevelCharactersToDelete,
-        });
-      }
-      lineLevelChanged(
-        lineNumber,
-        lineLevel,
-        lineLevel - intersectingLevelsFrom
+  const lineLevelChanged = (line: Line, fromLevel: number, toLevel: number) => {
+    console.log("line level changed", line.number, fromLevel, toLevel);
+    if (toLevel < fromLevel && fromLevel > 0) {
+      resultingChanges.push({
+        from: line.from + Math.max(0, toLevel),
+        to: line.from + fromLevel,
+      });
+    }
+    if (fromLevel !== toLevel) {
+      resultingEffects.push(
+        setBlockLevelEffect.of({
+          changeText: false,
+          fromLevel,
+          toLevel,
+          lineNumber: line.number,
+        })
       );
     }
   };
+  const lineDeleted = (lineNumber: number, fromLevel: number) => {
+    console.log("deleting line", lineNumber, fromLevel);
+    resultingEffects.push(
+      setBlockLevelEffect.of({
+        changeText: false,
+        fromLevel,
+        toLevel: -1,
+        lineNumber,
+      })
+    );
+  };
 
-  transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
-    console.log("changes", fromA, toA, fromB, toB);
-    const newLineCharacterLength = 1;
+  transaction.changes.iterChanges((fromA, toA, _, __, text) => {
+    console.log("changes", fromA, toA);
     const startingLine = startDoc.lineAt(fromA);
     const endingLine = startDoc.lineAt(toA);
-    // starting line
-    handleLineIntersection(
-      startingLine.number,
-      startingLine.from,
-      levelOfLine(startingLine.number),
-      fromA - startingLine.from,
-      Math.min(toA - startingLine.from, startingLine.to),
-      text.line(1).length
+    // eg if we delete a line ending / replace with identical text
+    console.log("changed", transaction.docChanged);
+    console.log("equal", transaction.startState.doc.eq(transaction.newDoc));
+    const lastText = text.line(text.lines).text;
+    console.log("text lines", text.lines);
+    const lastTextLineIsLineBreakAdjustment = lastText === "" ? 1 : 0;
+    console.log("last text line break", lastTextLineIsLineBreakAdjustment);
+    const changedLines =
+      endingLine.number -
+      startingLine.number +
+      1 -
+      lastTextLineIsLineBreakAdjustment;
+    console.log("affected lines", changedLines);
+    const lineChangeDiff = text.lines - changedLines;
+    console.log("line chane diff", lineChangeDiff);
+
+    console.log("starting line", startingLine);
+    console.log("ending line", endingLine);
+
+    // start line
+    const startLineIntersection = fromA - startingLine.from;
+    const startLevel = levelOfLine(startingLine.number);
+    console.log("start line intersection", startLineIntersection);
+    console.log("startlevel", startLevel);
+    lineLevelChanged(
+      startingLine,
+      startLevel,
+      Math.min(startLevel, startLineIntersection)
     );
 
-    if (startingLine.number !== endingLine.number) {
-      for (
-        let currentLine = startingLine.number + 1;
-        currentLine <= endingLine.number;
-        currentLine++
+    // lines in-between
+    const affectedOldLinesCount = endingLine.number - startingLine.number + 1;
+    const affectedNewLinesCount = text.lines;
+    const maxAffectedLinesCount = Math.max(
+      affectedNewLinesCount,
+      affectedOldLinesCount
+    );
+    console.log("max affected lines", maxAffectedLinesCount);
+    console.log("affected old", affectedOldLinesCount);
+    console.log("affected new", affectedNewLinesCount);
+
+    for (let lineNumber = 1; lineNumber < maxAffectedLinesCount; lineNumber++) {
+      const affectedOldLine =
+        lineNumber < affectedOldLinesCount
+          ? startDoc.line(lineNumber + startingLine.number)
+          : undefined;
+      const affectedNewLine =
+        lineNumber < affectedNewLinesCount ? text.line(lineNumber) : undefined;
+      console.log("affected lines", affectedOldLine, affectedNewLine);
+
+      if (affectedOldLine !== undefined && affectedNewLine !== undefined) {
+        // replace
+        if (
+          affectedOldLinesCount === affectedNewLinesCount &&
+          lineNumber === affectedOldLinesCount
+        ) {
+          // last line
+          console.log("resolving last line");
+          // TODO extract into common function (with lower last line function)
+          const endLineIntersection = toA - endingLine.from;
+          const remainingLevelIntersection =
+            levelOfLine(endingLine.number) - endLineIntersection;
+
+          console.log(
+            "remaining level intersection",
+            remainingLevelIntersection
+          );
+          if (remainingLevelIntersection > 0) {
+            lineLevelChanged(
+              endingLine,
+              levelOfLine(endingLine.number),
+              remainingLevelIntersection
+            );
+            resultingChanges.push({
+              from: endingLine.from + endLineIntersection,
+              to:
+                endingLine.from +
+                endLineIntersection +
+                remainingLevelIntersection,
+            });
+          }
+        } else {
+          lineLevelChanged(
+            affectedOldLine,
+            levelOfLine(affectedOldLine.number),
+            0
+          );
+        }
+      } else if (
+        affectedOldLine !== undefined &&
+        affectedNewLine === undefined
       ) {
-        lineDeleted(currentLine, levelOfLine(currentLine));
-      }
+        // delete
+        console.log("diff line cound", affectedNewLinesCount - lineNumber);
+        console.log(
+          "diff line cound",
+          affectedOldLinesCount - affectedNewLinesCount
+        );
+        // TODO extract into common function (with upper last line function)
+        console.log("resolving last line");
+        const endLineIntersection = toA - endingLine.from;
+        const remainingLevelIntersection =
+          levelOfLine(endingLine.number) - endLineIntersection;
 
-      // ending line
-      const endLineIntersection = toA - endingLine.from;
-      const remainingLevelIntersection =
-        levelOfLine(endingLine.number) - endLineIntersection;
-
-      if (remainingLevelIntersection > 0) {
-        changes.push({
-          from: endingLine.from + endLineIntersection - newLineCharacterLength,
-          to:
-            endingLine.from +
-            endLineIntersection +
-            remainingLevelIntersection -
-            newLineCharacterLength,
-        });
+        console.log("remaining level intersection", remainingLevelIntersection);
+        if (remainingLevelIntersection > 0) {
+          lineLevelChanged(
+            endingLine,
+            levelOfLine(endingLine.number),
+            remainingLevelIntersection
+          );
+          resultingChanges.push({
+            from: endingLine.from + endLineIntersection,
+            to:
+              endingLine.from +
+              endLineIntersection +
+              remainingLevelIntersection,
+          });
+        }
+        console.log("deleting old line with number", affectedOldLine.number);
+        lineDeleted(
+          affectedOldLine.number,
+          levelOfLine(affectedOldLine.number)
+        );
+      } else if (
+        affectedOldLine === undefined &&
+        affectedNewLine !== undefined
+      ) {
+        // insert
+        console.log("insert");
+        resultingEffects.push(
+          setBlockLevelEffect.of({
+            changeText: false,
+            fromLevel: -1,
+            toLevel: 0,
+            // TODO only set last text line break if new text has content?
+            lineNumber:
+              affectedOldLinesCount - lastTextLineIsLineBreakAdjustment,
+          })
+        );
+      } else {
+        throw Error("Too many iterations.");
       }
     }
   });
 
-  return [transaction, { changes, effects, sequential: true }];
+  return [
+    transaction,
+    { changes: resultingChanges, effects: resultingEffects, sequential: false },
+  ];
 }
 
 export const detectBlockLevelChangesByTextChanges =
   EditorState.transactionFilter.of((transaction) =>
     applyTextChangeToContent(transaction, (line) =>
-      findBlockLevelOfLine(transaction.state, line)
+      findBlockLevelOfLine(transaction.startState, line)
     )
   );

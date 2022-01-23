@@ -5,6 +5,7 @@ export const moveCursorToBlockLevelIndentationEndExtension =
   EditorState.transactionFilter.of((transaction) => {
     const main = transaction.selection?.main;
     if (!main) return transaction;
+    let selection: { head: number; anchor: number } | undefined = undefined;
     const { state } = transaction;
     const headLine = state.doc.lineAt(main.head);
     const anchorLine = state.doc.lineAt(main.anchor);
@@ -14,17 +15,23 @@ export const moveCursorToBlockLevelIndentationEndExtension =
     let newHead = main.head;
     if (main.anchor - anchorLine.from < anchorLevel) {
       newAnchor = anchorLine.from + anchorLevel;
+      selection = {
+        head: newHead,
+        anchor: newAnchor,
+      };
     }
     if (main.head - headLine.from < headLevel) {
       newHead = headLine.from + headLevel;
+      console.log("moving head", main.head - newHead);
+      selection = {
+        head: newHead,
+        anchor: newAnchor,
+      };
     }
     return [
       transaction,
       {
-        selection: {
-          head: newHead,
-          anchor: newAnchor,
-        },
+        selection,
         sequential: false,
       },
     ];

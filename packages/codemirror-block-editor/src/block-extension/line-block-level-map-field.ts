@@ -5,8 +5,9 @@ export type SetBlockLevelEffectSpec = {
   lineNumber: number;
   fromLevel: number;
   toLevel: number;
-  changeText: boolean;
+  changeText?: boolean;
 };
+
 export const setBlockLevelEffect =
   StateEffect.define<SetBlockLevelEffectSpec>();
 
