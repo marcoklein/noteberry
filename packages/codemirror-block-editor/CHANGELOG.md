@@ -1,10 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Handle line deletions
+- Support history
+- Add level indentation marker (circle)
+
 ## 0.3.0
 
 - Using the `padding-start` approach again
 - Fixed bug that prevented a cursor refresh
 - Improved stability of block level changes
+- Write event notifications on screen
 
 ## 0.2.0
 

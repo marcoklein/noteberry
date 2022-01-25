@@ -42,7 +42,7 @@ export const blockLevelDecorationsField = StateField.define<DecorationSet>({
     }[] = [];
     for (const effect of transaction.effects) {
       if (effect.is(setBlockLevelEffect)) {
-        console.log("set block level effect", effect.value);
+        // console.log("set block level effect", effect.value);
         const line = transaction.state.doc.line(effect.value.lineNumber);
         const toLevel = effect.value.toLevel;
         const fromLevel = findBlockLevelOfLine(decorations, line);
@@ -75,11 +75,11 @@ function _updateBlockLevelOfLine(
     filter: (from) => from !== line.from,
     add,
   });
-  console.log(
-    "set block indentation for line",
-    line.number,
-    " to level ",
-    level
-  );
+  // console.log(
+  //   "set block indentation for line",
+  //   line.number,
+  //   " to level ",
+  //   level
+  // );
   return decorations;
 }
