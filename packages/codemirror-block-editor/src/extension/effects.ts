@@ -1,43 +1,38 @@
-import { EditorState, EditorView } from "@codemirror/basic-setup";
+import { EditorState } from "@codemirror/basic-setup";
 import { StateEffect } from "@codemirror/state";
-import { keymap } from "@codemirror/view";
 import {
   blockLevelDecorationsField,
   findBlockLevelOfLine,
-  setBlockLevelEffect,
-} from "./block-level-decoration-extension";
+} from "./decorations";
 
+/**
+ * Increase block level of line number.
+ */
 export const inputIncreaseBlockLevelEffect = StateEffect.define<number>();
+
+/**
+ * Decrease block level of line number.
+ */
 export const inputDecreaseBlockLevelEffect = StateEffect.define<number>();
 
-function dispatchBlockCommand(view: EditorView, mode: "increase" | "decrease") {
-  const effects: StateEffect<unknown>[] = [];
-  const lines = view.state.selection.ranges.map((range) =>
-    view.state.doc.lineAt(range.from)
-  );
-  for (const line of lines) {
-    if (mode === "increase") {
-      effects.push(inputIncreaseBlockLevelEffect.of(line.number));
-    } else if (mode === "decrease") {
-      effects.push(inputDecreaseBlockLevelEffect.of(line.number));
-    } else {
-      throw new Error("Unhandled mode: " + mode);
-    }
-  }
-  if (!effects.length) return false;
-  view.dispatch({ effects });
-  return true;
-}
+/**
+ * Issued if there is a change of a block level.
+ */
+export type SetBlockLevelEffectSpec = {
+  fromLevel: number;
+  toLevel: number;
+  lineNumber: number;
+};
 
-export const indendationKeymap = keymap.of([
-  {
-    key: "Tab",
-    preventDefault: true,
-    run: (view) => dispatchBlockCommand(view, "increase"),
-    shift: (view) => dispatchBlockCommand(view, "decrease"),
-  },
-]);
+/**
+ * Set block level on a line number.
+ */
+export const setBlockLevelEffect =
+  StateEffect.define<SetBlockLevelEffectSpec>();
 
+/**
+ * Converts increase and decrease input effects into `SetLevelEffect`s.
+ */
 export const mapInputBlockEffectsToSetBlockEffects =
   EditorState.transactionFilter.of((transaction) => {
     const { state } = transaction;

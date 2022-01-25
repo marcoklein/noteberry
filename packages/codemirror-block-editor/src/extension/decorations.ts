@@ -1,16 +1,8 @@
-import { EditorState, EditorView } from "@codemirror/basic-setup";
-import { Extension, StateEffect, StateField } from "@codemirror/state";
+import { EditorView } from "@codemirror/basic-setup";
+import { Extension, StateField } from "@codemirror/state";
 import { Line } from "@codemirror/text";
 import { Decoration, DecorationSet } from "@codemirror/view";
-import { invertedEffects } from "@codemirror/history";
-
-export type SetBlockLevelEffectSpec = {
-  fromLevel: number;
-  toLevel: number;
-  lineNumber: number;
-};
-export const setBlockLevelEffect =
-  StateEffect.define<SetBlockLevelEffectSpec>();
+import { setBlockLevelEffect } from "./effects";
 
 /**
  * Gets a block level of a line by searching the given decorations.
@@ -32,6 +24,11 @@ export const findBlockLevelOfLine = (
   return level;
 };
 
+/**
+ * All decorations for information about the current indentation levels of lines.
+ *
+ * Use `findBlockLevelOfLine` to get the block level indentation of a line.
+ */
 export const blockLevelDecorationsField = StateField.define<DecorationSet>({
   create() {
     return Decoration.none;
@@ -117,25 +114,7 @@ export const blockLevelDecorationsField = StateField.define<DecorationSet>({
 });
 
 export function blockLevelDecorationExtension(_options: {} = {}): Extension {
-  return [
-    blockLevelDecorationsField,
-    EditorState.transactionFilter.of((transaction) => {
-      if (
-        transaction.effects.findIndex((effect) =>
-          effect.is(setBlockLevelEffect)
-        ) !== -1
-      ) {
-        const head =
-          transaction.selection?.main.head ??
-          transaction.startState.selection.main.head;
-        const anchor =
-          transaction.selection?.main.anchor ??
-          transaction.startState.selection.main.anchor;
-        return [transaction, { selection: { head, anchor } }];
-      }
-      return transaction;
-    }),
-  ];
+  return [blockLevelDecorationsField];
 }
 
 function _updateBlockLevelOfLine(
