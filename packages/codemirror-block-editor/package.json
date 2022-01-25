@@ -6,7 +6,7 @@
     "TypeScript",
     "ESM"
   ],
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": {
     "name": "Marco Klein"
   },
@@ -15,10 +15,13 @@
   "exports": "./dist/index.js",
   "scripts": {
     "start": "parcel src/index.html",
-    "build": "parcel build src/index.html --public-url .",
+    "build": "yarn generate:version && parcel build src/index.html --public-url .",
     "deploy": "yarn build && gh-pages -d ./dist",
     "test": "mocha --loader=ts-node/esm src/**/*.spec.ts --experimental-specifier-resolution=node",
-    "test:watch": "nodemon --exec \"yarn test\" --watch src -e js,ts"
+    "test:watch": "nodemon --exec \"yarn test\" --watch src -e js,ts",
+    "parcel": "parcel",
+    "generate:version": "genversion src/version.gen.ts --es6",
+    "postinstall": "yarn generate:version"
   },
   "devDependencies": {
     "@types/chai": "^4.3.0",
@@ -29,12 +32,13 @@
     "nodemon": "^2.0.15",
     "parcel": "^2.1.1",
     "ts-node": "^10.4.0",
-    "typescript": "^4.5.4"
+    "typescript": "^4.5.4",
+    "genversion": "^3.0.2"
   },
   "dependencies": {
     "@codemirror/basic-setup": "^0.19.1",
     "@codemirror/stream-parser": "^0.19.3",
     "@codemirror/text": "^0.19.5",
-    "@replit/codemirror-vim": "^0.19.0-beta.8"
+    "@replit/codemirror-vim": "^0.19.0"
   }
 }

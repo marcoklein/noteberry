@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.0
+
+- Using the `padding-start` approach again
+- Fixed bug that prevented a cursor refresh
+
 ## 0.2.0
 
 - Move selection out of block level indentation

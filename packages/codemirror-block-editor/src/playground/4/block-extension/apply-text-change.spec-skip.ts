@@ -17,6 +17,34 @@ describe("Block Level Changes", () => {
       ]
     ));
 
+  it("should insert a new line", () =>
+    testTextChange(
+      ["A", "-B"],
+      { from: 1, to: 1, insert: "\n" },
+      ["A", "", "-B"],
+      [
+        {
+          line: 1,
+          from: -1,
+          to: 0,
+        },
+      ]
+    ));
+
+  it("should remove a line", () =>
+    testTextChange(
+      ["A", "-B"],
+      { from: 1, to: 2 },
+      ["AB"],
+      [
+        {
+          line: 2,
+          from: 1,
+          to: -1,
+        },
+      ]
+    ));
+
   it("should replace the line break and move one line", () =>
     testTextChange(
       ["A", "-B", "--C"],
@@ -77,6 +105,20 @@ describe("Block Level Changes", () => {
       ]
     ));
 
+  it("should delete a complete line", () =>
+    testTextChange(
+      ["A", "-B", "--C"],
+      { from: 2, to: 5 },
+      ["A", "--C"],
+      [
+        {
+          from: 1,
+          line: 2,
+          to: -1,
+        },
+      ]
+    ));
+
   it("should replace characters within level", () =>
     testTextChange(
       ["----A"],
@@ -90,12 +132,12 @@ describe("Block Level Changes", () => {
       ]
     ));
 
-  it("should replace the line break and change bottom line level", () =>
+  it("should replace the line break without changing the bottom line level", () =>
     testTextChange(
       ["A", "-B", "-C"],
       { from: 1, to: 2, insert: "X\n" },
-      ["AX", "B", "-C"],
-      [{ from: 1, line: 2, to: 0 }]
+      ["AX", "-B", "-C"],
+      []
     ));
 
   it("should delete and replace multiple lines", () =>
@@ -177,7 +219,8 @@ function testTextChange(
         );
         expect(effect.value.fromLevel).to.equal(
           expectedLevelChanges[foundLevelChangeIndex].from ??
-            lineLevelMapping[effect.value.lineNumber]
+            lineLevelMapping[effect.value.lineNumber],
+          `From level does not match`
         );
         expectedLevelChanges.splice(foundLevelChangeIndex, 1);
       }

@@ -1,13 +1,8 @@
 import { basicSetup, EditorState, EditorView } from "@codemirror/basic-setup";
 import { vim } from "@replit/codemirror-vim";
-import { blockLevelDecorationExtension } from "./block-level-decoration-extension";
-import {
-  indendationKeymap,
-  mapInputBlockEffectsToSetBlockEffects,
-} from "./input-commands";
-import { writeVersionToHtml } from "./set-version";
+import { blockExtension } from "./block-extension/block-extension";
 
-writeVersionToHtml();
+console.log("starting");
 
 const initialState = EditorState.create({
   doc: [
@@ -18,13 +13,7 @@ const initialState = EditorState.create({
     "itemC",
     "itemD",
   ].join("\n"),
-  extensions: [
-    vim(),
-    indendationKeymap,
-    mapInputBlockEffectsToSetBlockEffects,
-    blockLevelDecorationExtension(),
-    basicSetup,
-  ],
+  extensions: [vim(), blockExtension(), basicSetup],
 });
 const view = new EditorView({
   parent: document.getElementById("editor") ?? undefined,
