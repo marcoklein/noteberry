@@ -4,6 +4,7 @@
 
 - Using the `padding-start` approach again
 - Fixed bug that prevented a cursor refresh
+- Improved stability of block level changes
 
 ## 0.2.0
 

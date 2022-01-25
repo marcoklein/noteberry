@@ -1,12 +1,16 @@
 import { Extension } from "@codemirror/state";
-import { blockLevelDecorationExtension } from "./decorations";
+import { blockLevelDecorationsField } from "./decorations";
 import { mapInputBlockEffectsToSetBlockEffects } from "./effects";
 import { blockLevelKeymap } from "./keymap";
+import { mapInputSetBlockLevelEffectsToSetBlockLevelEffects } from "./policies";
+import { updateCursor } from "./update-cursor";
 
 export function blockLevelExtension(_options: {} = {}): Extension {
   return [
-    blockLevelDecorationExtension(),
     blockLevelKeymap,
+    blockLevelDecorationsField,
     mapInputBlockEffectsToSetBlockEffects,
+    mapInputSetBlockLevelEffectsToSetBlockLevelEffects,
+    updateCursor,
   ];
 }

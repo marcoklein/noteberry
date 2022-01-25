@@ -23,6 +23,13 @@ export type SetBlockLevelEffectSpec = {
   toLevel: number;
   lineNumber: number;
 };
+/**
+ * Issued to change the block level of a line.
+ * But will not necessarily change the level because it is passing a filter that verifies the level settings.
+ * `setBlockLevelEffect` will adjust the level.
+ */
+export const inputSetBlockLevelEffect =
+  StateEffect.define<SetBlockLevelEffectSpec>();
 
 /**
  * Set block level on a line number.
@@ -50,29 +57,8 @@ export const mapInputBlockEffectsToSetBlockEffects =
           0,
           isIncreaseEffect ? fromLevel + 1 : fromLevel - 1
         );
-        if (fromLevel === toLevel) {
-          console.log("no change for equal from and to level");
-          continue;
-        }
-        if (lineNumber === 1) {
-          console.log("cannot change level of root line");
-          continue;
-        }
-        if (isIncreaseEffect) {
-          const previousLevel = findBlockLevelOfLine(
-            decorations,
-            state.doc.line(lineNumber - 1)
-          );
-          if (toLevel > previousLevel + 1) {
-            // only 1 level jumps
-            console.log("only level jumps of 1 are allowed");
-            continue;
-          }
-        } else {
-          // decrease
-        }
         effects.push(
-          setBlockLevelEffect.of({
+          inputSetBlockLevelEffect.of({
             fromLevel,
             toLevel,
             lineNumber,

@@ -1,5 +1,5 @@
 import { EditorView } from "@codemirror/basic-setup";
-import { Extension, StateField } from "@codemirror/state";
+import { StateField } from "@codemirror/state";
 import { Line } from "@codemirror/text";
 import { Decoration, DecorationSet } from "@codemirror/view";
 import { setBlockLevelEffect } from "./effects";
@@ -34,17 +34,7 @@ export const blockLevelDecorationsField = StateField.define<DecorationSet>({
     return Decoration.none;
   },
   update(decorations, transaction) {
-    const { state, newDoc, startState } = transaction;
-    const startDoc = startState.doc;
-    transaction.changes.iterChanges((_fromA, toA, _fromB, toB, text) => {
-      const fromLineNumber = startDoc.lineAt(toA).number;
-      const toLineNumber = newDoc.lineAt(toB).number;
-      console.log("lines", fromLineNumber, toLineNumber);
-      if (text.lines > 1) console.log("new line!");
-      if (fromLineNumber > toLineNumber) console.log("deleted line");
-    });
     decorations = decorations.map(transaction.changes);
-    const affectedLinesMap: { [lineNumber: number]: boolean } = {};
     const lineChanges: {
       lineNumber: number;
       fromLevel: number;
@@ -56,66 +46,14 @@ export const blockLevelDecorationsField = StateField.define<DecorationSet>({
         const line = transaction.state.doc.line(effect.value.lineNumber);
         const toLevel = effect.value.toLevel;
         const fromLevel = findBlockLevelOfLine(decorations, line);
-        // TODO add logic to verify line change from block-level-extension
         decorations = _updateBlockLevelOfLine(decorations, line, toLevel);
         lineChanges.push({ lineNumber: line.number, fromLevel, toLevel });
-        affectedLinesMap[line.number] = true;
-      }
-    }
-
-    // TODO apply adjustment logic for all block level effects
-    const totalLines = newDoc.lines;
-    for (const { lineNumber, fromLevel, toLevel } of lineChanges) {
-      if (fromLevel < toLevel) {
-        // increase
-        for (
-          let childLineNumber = lineNumber + 1;
-          childLineNumber <= totalLines;
-          childLineNumber++
-        ) {
-          // next iteration will handle the next affected line
-          // TODO verify that line numbers are sorted!
-          if (affectedLinesMap[childLineNumber]) break;
-          const childLine = newDoc.line(childLineNumber);
-          const childLineLevel = findBlockLevelOfLine(decorations, childLine);
-          // is no child cause it has been on the same or smaller level
-          if (childLineLevel <= fromLevel) break;
-          // also increase children
-          decorations = _updateBlockLevelOfLine(
-            decorations,
-            childLine,
-            childLineLevel + 1
-          );
-        }
-      } else {
-        // decrease
-        for (
-          let childLineNumber = lineNumber + 1;
-          childLineNumber <= totalLines;
-          childLineNumber++
-        ) {
-          // next iteration will handle the next affected line
-          if (affectedLinesMap[childLineNumber]) break;
-          const childLine = newDoc.line(childLineNumber);
-          const childLineLevel = findBlockLevelOfLine(decorations, childLine);
-          if (childLineLevel <= fromLevel) break;
-          // also increase children
-          decorations = _updateBlockLevelOfLine(
-            decorations,
-            childLine,
-            childLineLevel - 1
-          );
-        }
       }
     }
     return decorations;
   },
   provide: (f) => EditorView.decorations.from(f),
 });
-
-export function blockLevelDecorationExtension(_options: {} = {}): Extension {
-  return [blockLevelDecorationsField];
-}
 
 function _updateBlockLevelOfLine(
   decorations: DecorationSet,

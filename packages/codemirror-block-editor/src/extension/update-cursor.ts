@@ -1,5 +1,5 @@
 import { EditorState } from "@codemirror/basic-setup";
-import { setBlockLevelEffect } from "./effects";
+import { inputSetBlockLevelEffect } from "./effects";
 
 /**
  * Ensures an update of the cursor if there is a block level change effect.
@@ -8,7 +8,7 @@ import { setBlockLevelEffect } from "./effects";
 export const updateCursor = EditorState.transactionFilter.of((transaction) => {
   if (
     transaction.effects.findIndex((effect) =>
-      effect.is(setBlockLevelEffect)
+      effect.is(inputSetBlockLevelEffect)
     ) !== -1
   ) {
     const head =
