@@ -4,7 +4,7 @@
 
 - Handle line deletions
 - Support history
-- Add level indentation marker (circle)
+- Disable `Tab+ESC` escape hatch for vim compatibility
 
 ## 0.3.0
 
@@ -12,6 +12,7 @@
 - Fixed bug that prevented a cursor refresh
 - Improved stability of block level changes
 - Write event notifications on screen
+- Add level indentation marker (circle)
 
 ## 0.2.0
 
