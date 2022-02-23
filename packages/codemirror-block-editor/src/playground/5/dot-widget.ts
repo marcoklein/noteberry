@@ -21,7 +21,7 @@ class DotWidget extends WidgetType {
 
     const wrap = document.createElement("span");
     wrap.style.paddingRight = `4px`;
-    // wrap.style.paddingLeft = `${this.level + 1}ch`;
+    wrap.style.paddingLeft = `${this.level + 1}ch`;
     wrap.appendChild(dot);
     return wrap;
   }
@@ -35,32 +35,24 @@ export const dotWidgetViewPlugin = ViewPlugin.fromClass(
   class {
     decorations = Decoration.none;
     update(update: ViewUpdate) {
-      // console.log("updating blocks");
       const tempDecos: Range<Decoration>[] = [];
-      for (const { from, to } of update.view.visibleRanges) {
-        const fromLine = update.view.state.doc.lineAt(from);
-        const toLine = update.view.state.doc.lineAt(to);
+      update.view.visibleRanges.forEach(({ from, to }) => {
+        const fromLine = update.state.doc.lineAt(from);
+        const toLine = update.state.doc.lineAt(to);
         for (
           let lineNumber = fromLine.number;
           lineNumber <= toLine.number;
           lineNumber++
         ) {
-          const line = update.view.state.doc.line(lineNumber);
-          const blockMarkerIndex = line.text.indexOf("- ");
-          if (blockMarkerIndex >= 0) {
-            tempDecos.push(
-              Decoration.replace({
-                widget: new DotWidget(blockMarkerIndex),
-                inclusiveStart: true,
-              }).range(
-                // line.from,
-                line.from + blockMarkerIndex,
-                line.from + blockMarkerIndex + 2
-              )
-            );
-          }
+          tempDecos.push(
+            Decoration.widget({
+              widget: new DotWidget(0),
+              block: false,
+              side: -1,
+            }).range(update.state.doc.line(lineNumber).from)
+          );
         }
-      }
+      });
       this.decorations = Decoration.set(tempDecos);
     }
   },

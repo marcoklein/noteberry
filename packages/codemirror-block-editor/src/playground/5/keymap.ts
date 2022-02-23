@@ -1,6 +1,10 @@
 import { EditorView } from "@codemirror/basic-setup";
-import { ChangeSpec } from "@codemirror/state";
+import { StateEffect } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
+import {
+  inputDecreaseBlockLevelEffect,
+  inputIncreaseBlockLevelEffect,
+} from "./effects";
 
 /**
  * Adds a keymap to increase block level with `Tab` and decrease level with `Tab-Shift`.
@@ -18,20 +22,20 @@ function _dispatchBlockCommand(
   view: EditorView,
   mode: "increase" | "decrease"
 ) {
-  const changes: ChangeSpec[] = [];
+  const effects: StateEffect<unknown>[] = [];
   const lines = view.state.selection.ranges.map((range) =>
     view.state.doc.lineAt(range.from)
   );
   for (const line of lines) {
     if (mode === "increase") {
-      changes.push({ from: line.from, insert: "  " });
+      effects.push(inputIncreaseBlockLevelEffect.of(line.number));
     } else if (mode === "decrease") {
-      changes.push({ from: line.from, to: line.from + 2 });
+      effects.push(inputDecreaseBlockLevelEffect.of(line.number));
     } else {
       throw new Error("Unhandled mode: " + mode);
     }
   }
-  if (!changes.length) return false;
-  view.dispatch({ changes });
+  if (!effects.length) return false;
+  view.dispatch({ effects });
   return true;
 }

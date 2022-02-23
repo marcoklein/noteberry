@@ -1,22 +1,16 @@
 import { Extension } from "@codemirror/state";
-import { blockLevelDecorationsField } from "./decorations";
 import { dotWidgetViewPlugin } from "./dot-widget";
-import { mapInputBlockEffectsToSetBlockEffects } from "./effects";
+import { handleChangeWithinBlockLevel } from "./handle-change-within-block-level";
 import { blockLevelKeymap } from "./keymap";
-import { blockLevelListenerExtension } from "./listener";
-import { mapInputSetBlockLevelEffectsToSetBlockLevelEffects } from "./policies";
+import { moveCursorToBlockLevelIndentationEndExtension } from "./move-selection";
 import { dotTheme } from "./theme";
-import { updateCursor } from "./update-cursor";
 
 export function blockLevelExtension(_options: {} = {}): Extension {
   return [
     dotTheme,
-    blockLevelListenerExtension(),
     blockLevelKeymap,
-    blockLevelDecorationsField,
-    mapInputBlockEffectsToSetBlockEffects,
-    mapInputSetBlockLevelEffectsToSetBlockLevelEffects,
-    updateCursor,
+    handleChangeWithinBlockLevel,
+    moveCursorToBlockLevelIndentationEndExtension,
     dotWidgetViewPlugin,
   ];
 }

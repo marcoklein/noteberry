@@ -2,9 +2,13 @@
 
 ## Unreleased
 
-- Handle line deletions
-- Support history
 - Disable `Tab+ESC` escape hatch for vim compatibility
+
+## 0.4.0
+
+- Refactor underlying architecture to use text as the basis for block level rendering
+- Support history
+- Handle line deletions
 
 ## 0.3.0
 

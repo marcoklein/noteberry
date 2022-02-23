@@ -46,3 +46,11 @@ There are several stages I went through while implementing the block indentation
 - logic to override individual file changes
 - several very complicated re-writes
 - did not get me closer to what the project should do
+
+### 5
+
+- block levels base on the `padding-left` approach
+- fixed the cursor refresh issue form `3`rd approach
+- however, when copying or deleting the line the indentation got lost
+- it might be possible to modify to text when copying it into the clipboard
+- therefore, it might be the simplest solution to work with `spaces` or `tabs` as indentation and overwrite them with decorations
