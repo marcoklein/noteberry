@@ -32,7 +32,9 @@ describe("Extension", () => {
     // when
     const changes = view.state.changes({ from: 3, insert: "\n" });
     const selection = { head: 4, anchor: 4 };
-    view.dispatch(view.state.update({ changes }, { selection }));
+    view.dispatch(
+      view.state.update({ changes }, { selection, sequential: true })
+    );
     // then
     expect(view.state.selection.main.head).toBe(6);
     expect(view.state.selection.main.anchor).toBe(6);
