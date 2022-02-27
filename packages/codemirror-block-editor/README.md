@@ -2,6 +2,8 @@
 
 Creating indented list blocks in [CodeMirror6](https://codemirror.net/6/).
 
+[Demo](https://marcoklein.github.io/codemirror6-block-indentation/)
+
 ## Prerequisite
 
 1. Clone this repository
@@ -21,6 +23,30 @@ Run the project
 ```bash
 yarn start
 ```
+
+## Testing
+
+Run tests with
+
+```bash
+yarn test
+```
+
+For running tests on change use
+
+```bash
+yarn test:watch
+```
+
+> Currently, the testing approach is very basic. Parcel builds `*.test.ts` files and karma picks up build files to run tests. Therefore, there is no direct mapping to the TypeScript source. This is due to the complicated setup with ESM modules.
+
+## Approach
+
+Handle only text changes to stay compatible with the VIM plugin and Codemirror text history. This means, if you want to indent a block you insert two spaces to the start of the line. That is how the VIM plugin would do it with the `>` key in visual mode.
+
+Raw text is parsed and decorations replace the `- ` string with a visual dot. Therefore, if you copy text text underlying text get copied which is very easy to handle.
+
+Custom implementation builds on the auto indentation of blocks and the deletion of blocks when the user deletes a character from the block indentation.
 
 ## Learnings
 

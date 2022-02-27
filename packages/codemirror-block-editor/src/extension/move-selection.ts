@@ -1,5 +1,5 @@
 import { EditorState } from "@codemirror/basic-setup";
-import { findBlockLevelOfLine } from "./find-block-level-of-line";
+import { findBlockLevelOfLineNumberInState } from "./find-block-level-of-line";
 
 export const moveCursorToBlockLevelIndentationEndExtension =
   EditorState.transactionFilter.of((transaction) => {
@@ -9,8 +9,11 @@ export const moveCursorToBlockLevelIndentationEndExtension =
     const { state } = transaction;
     const headLine = state.doc.lineAt(main.head);
     const anchorLine = state.doc.lineAt(main.anchor);
-    const headLevel = findBlockLevelOfLine(state, headLine.number);
-    const anchorLevel = findBlockLevelOfLine(state, anchorLine.number);
+    const headLevel = findBlockLevelOfLineNumberInState(state, headLine.number);
+    const anchorLevel = findBlockLevelOfLineNumberInState(
+      state,
+      anchorLine.number
+    );
     let newAnchor = main.anchor;
     let newHead = main.head;
     // console.log("anchor:", newAnchor, newHead);

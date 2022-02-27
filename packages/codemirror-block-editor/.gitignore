@@ -4,3 +4,4 @@ node_modules
 dist
 .parcel-cache
 *.gen.ts
+dist-test

@@ -2,8 +2,8 @@ import { EditorView } from "@codemirror/basic-setup";
 
 export const dotTheme = EditorView.baseTheme({
   ".cm-dot": {
-    height: "10px",
-    width: "10px",
+    height: "1.3ch",
+    width: "1.3ch",
     backgroundColor: "#bbb",
     borderRadius: "50%",
     display: "inline-block",
@@ -11,7 +11,5 @@ export const dotTheme = EditorView.baseTheme({
   },
   ".cm-dot:hover": {
     backgroundColor: "#000",
-    height: "10px",
-    width: "10px",
   },
 });

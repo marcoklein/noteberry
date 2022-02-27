@@ -3,12 +3,14 @@
 ## Unreleased
 
 - Disable `Tab+ESC` escape hatch for vim compatibility
+- Improve testing pipeline by properly integrating the Karma runner
 
 ## 0.4.0
 
 - Refactor underlying architecture to use text as the basis for block level rendering
 - Support history
 - Handle line deletions
+- Execute unit tests in browser with Karma
 
 ## 0.3.0
 

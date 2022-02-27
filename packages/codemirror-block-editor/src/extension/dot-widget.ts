@@ -20,7 +20,7 @@ class DotWidget extends WidgetType {
     dot.classList.add("cm-dot");
 
     const wrap = document.createElement("span");
-    wrap.style.paddingRight = `4px`;
+    wrap.style.paddingRight = `0.7ch`;
     // wrap.style.paddingLeft = `${this.level + 1}ch`;
     wrap.appendChild(dot);
     return wrap;
