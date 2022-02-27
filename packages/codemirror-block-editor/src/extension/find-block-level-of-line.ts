@@ -1,19 +1,31 @@
-import { EditorState } from "@codemirror/state";
+import { Text } from "@codemirror/text";
 
 export const BLOCK_LEVEL_TEXT_PATTERN = "- ";
 
+/**
+ * Recusively walks up lines to find the first line that has a block level text pattern.
+ *
+ * @param state
+ * @param lineNumber
+ * @returns
+ */
 export function findBlockLevelOfLineNumberInState(
-  state: EditorState,
+  doc: Text,
   lineNumber: number
 ) {
-  // TODO walk upwards to find block level if current line has no block level text pattern
-  const index = state.doc
-    .line(lineNumber)
-    // TODO check if start of line is only whitespaces
-    .text.indexOf(BLOCK_LEVEL_TEXT_PATTERN);
-  if (index >= 0) {
-    return index + 2;
+  for (
+    let currentLineNumber = lineNumber;
+    currentLineNumber >= 1;
+    currentLineNumber--
+  ) {
+    const blockLevel = findBlockLevelCharacterIndentationOfLine(
+      doc.line(currentLineNumber).text
+    );
+    if (blockLevel > 0) {
+      return blockLevel;
+    }
   }
+
   return 0;
 }
 

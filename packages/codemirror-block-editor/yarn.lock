@@ -2226,6 +2226,13 @@ karma-jasmine@^4.0.1:
   dependencies:
     jasmine-core "^3.6.0"
 
+karma-spec-reporter@^0.0.33:
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/karma-spec-reporter/-/karma-spec-reporter-0.0.33.tgz#5b2712c3eaff7ae50dbd6ad4e5fb59befd740a96"
+  integrity sha512-xRVevDUkiIVhKbDQ3CmeGEpyzA4b3HeVl95Sx5yJAvurpdKUSYF6ZEbQOqKJ7vrtDniABV1hyFez9KX9+7ruBA==
+  dependencies:
+    colors "1.4.0"
+
 karma@^6.3.16:
   version "6.3.16"
   resolved "https://registry.yarnpkg.com/karma/-/karma-6.3.16.tgz#76d1a705fd1cf864ee5ed85270b572641e0958ef"

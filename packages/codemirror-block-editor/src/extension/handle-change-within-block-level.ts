@@ -9,10 +9,7 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
     transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
       const fromLine = doc.lineAt(fromA);
       const toLine = doc.lineAt(toA);
-      const fromLevel = findBlockLevelOfLineNumberInState(
-        transaction.startState,
-        fromLine.number
-      );
+      const fromLevel = findBlockLevelOfLineNumberInState(doc, fromLine.number);
       if (
         fromA === fromLine.from &&
         fromA === toA && // inserted something

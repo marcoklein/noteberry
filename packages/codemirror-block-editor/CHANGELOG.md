@@ -5,6 +5,11 @@
 - Disable `Tab+ESC` escape hatch for vim compatibility
 - Improve testing pipeline by properly integrating the Karma runner
 
+## 0.5.0
+
+- Using [Karma Spec Reporter](https://www.npmjs.com/package/karma-spec-reporter) for better summaries of tests
+- Moving cursor out of block level indentation
+
 ## 0.4.0
 
 - Refactor underlying architecture to use text as the basis for block level rendering

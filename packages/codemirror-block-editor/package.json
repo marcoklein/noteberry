@@ -6,7 +6,7 @@
     "TypeScript",
     "ESM"
   ],
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": {
     "name": "Marco Klein"
   },
@@ -16,8 +16,8 @@
   "scripts": {
     "start": "parcel src/index.html",
     "test": "yarn test:build && karma start karma.conf.cjs",
-    "test:watch": "nodemon --exec \"yarn test\" --watch src -e js,ts",
-    "test:build": "rimraf dist-test && parcel build 'src/**/*.test.ts' --dist-dir dist-test",
+    "test:watch": "nodemon --exec \"yarn test\" --watch src --watch tests -e js,ts",
+    "test:build": "rimraf dist-test/* && parcel build '(src|tests)/**/*.test.ts' --dist-dir dist-test",
     "build": "yarn generate:version && parcel build src/index.html --public-url .",
     "deploy": "yarn build && gh-pages -d ./dist",
     "generate:version": "genversion src/version.gen.ts --es6",
@@ -31,6 +31,7 @@
     "karma": "^6.3.16",
     "karma-chrome-launcher": "^3.1.0",
     "karma-jasmine": "^4.0.1",
+    "karma-spec-reporter": "^0.0.33",
     "nodemon": "^2.0.15",
     "parcel": "^2.1.1",
     "puppeteer": "^13.4.0",
