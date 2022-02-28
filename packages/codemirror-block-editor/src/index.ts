@@ -6,7 +6,14 @@ import { writeVersionToHtml } from "./write-version-to-html";
 writeVersionToHtml();
 
 const initialState = EditorState.create({
-  doc: ["- a"].join("\n"),
+  doc: [
+    "- Indent block with Tab",
+    "- and use Shift-Tab to decrease the block indentation",
+    "- itemA",
+    "  - itemB",
+    "    - itemC",
+    "- itemD",
+  ].join("\n"),
   extensions: [
     //vim(),
     blockLevelExtension(),
