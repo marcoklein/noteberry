@@ -42,11 +42,20 @@ yarn test:watch
 
 ## Approach
 
+### Implementation
+
 Handle only text changes to stay compatible with the VIM plugin and Codemirror text history. This means, if you want to indent a block you insert two spaces to the start of the line. That is how the VIM plugin would do it with the `>` key in visual mode.
 
 Raw text is parsed and decorations replace the `- ` string with a visual dot. Therefore, if you copy text text underlying text get copied which is very easy to handle.
 
 Custom implementation builds on the auto indentation of blocks and the deletion of blocks when the user deletes a character from the block indentation.
+
+### Naming
+
+- **Block**: Section that may span multiple lines. Marked by a dot in the editor.
+- **Block Line**: Any line within a block.
+- **Root Block Line**: Starting line of a block.
+- **Child Block Line**: Lines that precede the _Root Block Line_.
 
 ## Learnings
 

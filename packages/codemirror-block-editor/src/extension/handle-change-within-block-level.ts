@@ -4,13 +4,13 @@ import { findBlockLevelOfLineNumberInDocument } from "./find-block-level-of-line
 
 export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
   (transaction) => {
-    const { doc } = transaction.state;
+    const { doc } = transaction.startState;
     const changes: ChangeSpec[] = [];
     transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
       const fromLine = doc.lineAt(fromA);
       // const toLine = doc.lineAt(toA);
       const fromLevel = findBlockLevelOfLineNumberInDocument(
-        doc,
+        transaction.startState.doc,
         fromLine.number
       );
       if (
@@ -22,9 +22,10 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
         // whitespace got inserted at beginning of line
         // => level increase
         // TODO for child block increase parent block only
-        console.log("level increase");
+        // console.log("level increase");
         return transaction;
       }
+
       if (
         fromB === toB && // deleted something
         text.lines === 1 &&
@@ -32,20 +33,13 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
       ) {
         // whitespace deleted in indentation
         // => level decrease
-        console.log("level decrease");
+        // console.log("level decrease");
         return transaction;
       }
 
-      if (fromA - fromLine.from < fromLevel) {
-        console.log(
-          fromA - fromLine.from,
-          fromA,
-          fromLine.from,
-          fromLevel,
-          fromLine.number
-        );
-        const deleteLineBreakOfPreviousLine =
-          fromLine.number === 1 || toA === fromLine.to + 1 ? 0 : 1;
+      if (fromA > fromLine.from && fromA - fromLine.from < fromLevel) {
+        // console.log("deleting line");
+        const deleteLineBreakOfPreviousLine = fromLine.number === 1 ? 0 : 1;
         changes.push({
           from: fromLine.from - deleteLineBreakOfPreviousLine,
           to: fromLine.from + fromLevel,
@@ -53,6 +47,6 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
         });
       }
     });
-    return [transaction, { changes, sequential: true }];
+    return [transaction, { changes, sequential: false }];
   }
 );

@@ -6,7 +6,7 @@ import {
 
 export const validateBlockIndentation = EditorState.transactionFilter.of(
   (transaction) => {
-    const doc = transaction.state.doc; // TODO change to newDoc
+    const doc = transaction.newDoc;
     const changes: ChangeSpec[] = [];
     transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
       const fromLine = doc.lineAt(fromA);

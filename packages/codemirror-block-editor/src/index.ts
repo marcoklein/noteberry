@@ -8,7 +8,7 @@ writeVersionToHtml();
 const initialState = EditorState.create({
   doc: ["- a"].join("\n"),
   extensions: [
-    // vim(),
+    //vim(),
     blockLevelExtension(),
     basicSetup,
   ],
