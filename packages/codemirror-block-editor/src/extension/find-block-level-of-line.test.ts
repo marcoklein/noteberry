@@ -1,4 +1,4 @@
-import { createTestEditorWithDoc } from "../../tests/test-utils";
+import { createTestEditorWithDoc } from "../../tests/test-utils.test";
 import { findBlockLevelOfLineNumberInDocument } from "./find-block-level-of-line";
 
 describe("Find Block Level of Line", () => {
