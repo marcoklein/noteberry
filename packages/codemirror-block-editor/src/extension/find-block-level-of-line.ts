@@ -9,7 +9,7 @@ export const BLOCK_LEVEL_TEXT_PATTERN = "- ";
  * @param lineNumber
  * @returns
  */
-export function findBlockLevelOfLineNumberInState(
+export function findBlockLevelOfLineNumberInDocument(
   doc: Text,
   lineNumber: number
 ) {

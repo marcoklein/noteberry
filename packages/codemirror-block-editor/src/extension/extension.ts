@@ -2,7 +2,7 @@ import { ChangeSpec, EditorState, Extension } from "@codemirror/state";
 import { dotWidgetViewPlugin } from "./dot-widget";
 import {
   findBlockLevelCharacterIndentationOfLine,
-  findBlockLevelOfLineNumberInState,
+  findBlockLevelOfLineNumberInDocument,
 } from "./find-block-level-of-line";
 import { handleChangeWithinBlockLevel } from "./handle-change-within-block-level";
 import { blockLevelKeymap } from "./keymap";
@@ -22,15 +22,23 @@ export const validateBlockIndentation = EditorState.transactionFilter.of(
         lineNumber++
       ) {
         const line = doc.line(lineNumber);
-        const blockLevel = findBlockLevelCharacterIndentationOfLine(line.text);
-        if (blockLevel <= 0) {
-          // block that needs space indentation
-
-          changes.push({
-            from: line.from,
-            // TODO insert right amount of spaces (depending on the block level)
-            insert: "  ",
-          });
+        const blockLevelOfLine = findBlockLevelCharacterIndentationOfLine(
+          line.text
+        );
+        if (blockLevelOfLine <= 0) {
+          const shouldBlockLevel = findBlockLevelOfLineNumberInDocument(
+            doc,
+            lineNumber
+          );
+          const numOfIndentationSpaces =
+            line.text.length - line.text.trimLeft().length;
+          const missingSpaces = shouldBlockLevel - numOfIndentationSpaces;
+          if (missingSpaces > 0) {
+            changes.push({
+              from: line.from,
+              insert: " ".repeat(missingSpaces),
+            });
+          }
         }
       }
     });
@@ -46,20 +54,21 @@ export const validateBlockIndentation = EditorState.transactionFilter.of(
  */
 const validateCursorPosition = EditorState.transactionFilter.of(
   (transaction) => {
+    console.log("validate cursor position");
     const doc = transaction.newDoc; // TODO change to newDoc
     let selectionChange: { anchor: number; head: number } | undefined =
       undefined;
 
     for (const { head, anchor } of transaction.newSelection.ranges) {
       const headLine = doc.lineAt(head);
-      const headBlockLevel = findBlockLevelOfLineNumberInState(
+      const headBlockLevel = findBlockLevelOfLineNumberInDocument(
         doc,
         headLine.number
       );
       const headBlockEndIndex = headLine.from + headBlockLevel;
 
       const anchorLine = doc.lineAt(anchor);
-      const anchorBlockLevel = findBlockLevelOfLineNumberInState(
+      const anchorBlockLevel = findBlockLevelOfLineNumberInDocument(
         doc,
         anchorLine.number
       );
@@ -87,12 +96,15 @@ const validateCursorPosition = EditorState.transactionFilter.of(
 
 export function blockLevelExtension(_options: {} = {}): Extension {
   return [
-    dotTheme,
-    blockLevelKeymap,
-    handleChangeWithinBlockLevel,
-    dotWidgetViewPlugin,
     // TODO there is a bug that changes precedence -> have to change order of extensions with that patch
+    dotWidgetViewPlugin,
+
     validateCursorPosition,
     validateBlockIndentation,
+
+    handleChangeWithinBlockLevel,
+
+    dotTheme,
+    blockLevelKeymap,
   ];
 }

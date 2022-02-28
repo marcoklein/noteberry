@@ -70,7 +70,7 @@ export const dotWidgetViewPlugin = ViewPlugin.fromClass(
       mousedown: (e, view) => {
         let target = e.target as HTMLElement;
         const line = view.state.doc.lineAt(view.posAtDOM(target));
-        console.log(target.nodeName);
+        // console.log(target.nodeName);
         if (target.classList.contains("cm-dot")) {
           console.log("mouse down on", line);
           e.preventDefault();

@@ -1,13 +1,16 @@
 import { createTestEditorWithDoc } from "../../tests/test-utils";
-import { findBlockLevelOfLineNumberInState } from "./find-block-level-of-line";
+import { findBlockLevelOfLineNumberInDocument } from "./find-block-level-of-line";
 
 describe("Find Block Level of Line", () => {
   it("should return block levels", () => {
     // given
     const view = createTestEditorWithDoc(["- a", "  "].join("\n"));
     // when
-    const lineWithBlock = findBlockLevelOfLineNumberInState(view.state.doc, 1);
-    const lineWithoutBlock = findBlockLevelOfLineNumberInState(
+    const lineWithBlock = findBlockLevelOfLineNumberInDocument(
+      view.state.doc,
+      1
+    );
+    const lineWithoutBlock = findBlockLevelOfLineNumberInDocument(
       view.state.doc,
       2
     );

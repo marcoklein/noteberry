@@ -1,15 +1,18 @@
 import { EditorState } from "@codemirror/basic-setup";
 import { ChangeSpec } from "@codemirror/state";
-import { findBlockLevelOfLineNumberInState } from "./find-block-level-of-line";
+import { findBlockLevelOfLineNumberInDocument } from "./find-block-level-of-line";
 
 export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
   (transaction) => {
-    const { doc } = transaction.startState;
+    const { doc } = transaction.state;
     const changes: ChangeSpec[] = [];
     transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
       const fromLine = doc.lineAt(fromA);
-      const toLine = doc.lineAt(toA);
-      const fromLevel = findBlockLevelOfLineNumberInState(doc, fromLine.number);
+      // const toLine = doc.lineAt(toA);
+      const fromLevel = findBlockLevelOfLineNumberInDocument(
+        doc,
+        fromLine.number
+      );
       if (
         fromA === fromLine.from &&
         fromA === toA && // inserted something
@@ -18,7 +21,9 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
       ) {
         // whitespace got inserted at beginning of line
         // => level increase
-        return;
+        // TODO for child block increase parent block only
+        console.log("level increase");
+        return transaction;
       }
       if (
         fromB === toB && // deleted something
@@ -27,17 +32,20 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
       ) {
         // whitespace deleted in indentation
         // => level decrease
-        return;
+        console.log("level decrease");
+        return transaction;
       }
 
       if (fromA - fromLine.from < fromLevel) {
+        console.log(
+          fromA - fromLine.from,
+          fromA,
+          fromLine.from,
+          fromLevel,
+          fromLine.number
+        );
         const deleteLineBreakOfPreviousLine =
-          // first line
-          fromLine.number === 1 ||
-          //
-          toA === fromLine.to + 1
-            ? 0
-            : 1;
+          fromLine.number === 1 || toA === fromLine.to + 1 ? 0 : 1;
         changes.push({
           from: fromLine.from - deleteLineBreakOfPreviousLine,
           to: fromLine.from + fromLevel,
@@ -45,6 +53,6 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
         });
       }
     });
-    return [transaction, { changes, sequential: false }];
+    return [transaction, { changes, sequential: true }];
   }
 );
