@@ -50,16 +50,32 @@ Raw text is parsed and decorations replace the `- ` string with a visual dot. Th
 
 Custom implementation builds on the auto indentation of blocks and the deletion of blocks when the user deletes a character from the block indentation.
 
+### Limiting interactions by limiting selections
+
+Selection is limited to the block content only:
+
+```sh
+- blockA1
+  |<--->| # selection range (inclusive)
+```
+
+Any selection in the _Block Marker_ is placed to the start of the block.
+
+To increase or decrease a block level the extension adds or removes whitespace from the start of a line.
+
 ### Naming
 
-- **Block**: Section that may span multiple lines. Marked by a dot in the editor.
+- **Block**: Section that may span multiple lines.
+- **Block Marker**: Text that indicates a block. E.g. `- `.
 - **Block Line**: Any line within a block.
 - **Root Block Line**: Starting line of a block.
 - **Child Block Line**: Lines that precede the _Root Block Line_.
+- **Line Content**: The text of a line.
+- **Block Content**: All text lines of a block. E.g. the sum of all _line contents_.
 
 ## Learnings
 
-There are several stages I went through while implementing the block indentation. They are all listed in the `src/playground` folder.
+There are several stages I went through while implementing the block indentation. They are all listed in the `learnings` folder.
 
 ### 1
 

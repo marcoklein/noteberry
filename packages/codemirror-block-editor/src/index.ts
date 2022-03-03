@@ -14,11 +14,7 @@ const initialState = EditorState.create({
     "    - itemC",
     "- itemD",
   ].join("\n"),
-  extensions: [
-    //vim(),
-    blockLevelExtension(),
-    basicSetup,
-  ],
+  extensions: [vim(), blockLevelExtension(), basicSetup],
 });
 const view = new EditorView({
   parent: document.getElementById("editor") ?? undefined,

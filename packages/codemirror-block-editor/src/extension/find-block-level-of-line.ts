@@ -29,6 +29,31 @@ export function findBlockLevelOfLineNumberInDocument(
   return 0;
 }
 
+export function findBlockLevelAndLineNumberOfLineNumberInDocument(
+  doc: Text,
+  lineNumber: number
+) {
+  for (
+    let currentLineNumber = lineNumber;
+    currentLineNumber >= 1;
+    currentLineNumber--
+  ) {
+    const blockLevel = findBlockLevelCharacterIndentationOfLine(
+      doc.line(currentLineNumber).text
+    );
+    if (blockLevel > 0) {
+      return {
+        rootBlockLine: currentLineNumber,
+        blockLevel,
+      };
+    }
+  }
+  return {
+    rootBlockLine: 0,
+    blockLevel: 0,
+  };
+}
+
 export function findBlockLevelCharacterIndentationOfLine(lineText: string) {
   const index = lineText.indexOf(BLOCK_LEVEL_TEXT_PATTERN);
   if (index >= 0) {

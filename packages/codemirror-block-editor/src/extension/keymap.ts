@@ -1,6 +1,10 @@
 import { EditorState, EditorView } from "@codemirror/basic-setup";
 import { ChangeSpec } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
+import {
+  findBlockLevelAndLineNumberOfLineNumberInDocument,
+  findBlockLevelOfLineNumberInDocument,
+} from "./find-block-level-of-line";
 
 /**
  * Adds a keymap to increase block level with `Tab` and decrease level with `Tab-Shift`.
@@ -24,9 +28,21 @@ function _dispatchBlockCommand(
   );
   for (const line of lines) {
     if (mode === "increase") {
+      console.log("increase");
       changes.push({ from: line.from, insert: "  " });
     } else if (mode === "decrease") {
-      changes.push({ from: line.from, to: line.from + 2 });
+      const { rootBlockLine, blockLevel } =
+        findBlockLevelAndLineNumberOfLineNumberInDocument(
+          view.state.doc,
+          line.number
+        );
+
+      if (rootBlockLine && blockLevel - 2 > 0) {
+        console.log(
+          `decrease rootBlockLine=${rootBlockLine}, blockLevel=${blockLevel}`
+        );
+        changes.push({ from: line.from, to: line.from + 2 });
+      }
     } else {
       throw new Error("Unhandled mode: " + mode);
     }

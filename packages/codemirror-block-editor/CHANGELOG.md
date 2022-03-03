@@ -9,6 +9,8 @@
 
 - Using [Karma Spec Reporter](https://www.npmjs.com/package/karma-spec-reporter) for better summaries of tests
 - Moving cursor out of block level indentation
+- Keep block indentation at certain level
+- Move `playground` to `learnings` folder
 
 ## 0.4.0
 

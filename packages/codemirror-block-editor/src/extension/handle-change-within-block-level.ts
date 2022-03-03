@@ -22,7 +22,7 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
         // whitespace got inserted at beginning of line
         // => level increase
         // TODO for child block increase parent block only
-        // console.log("level increase");
+        console.log("level increased");
         return transaction;
       }
 
@@ -33,12 +33,13 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
       ) {
         // whitespace deleted in indentation
         // => level decrease
-        // console.log("level decrease");
+        console.log("level decreased");
         return transaction;
       }
 
       if (fromA > fromLine.from && fromA - fromLine.from < fromLevel) {
-        // console.log("deleting line");
+        // delete all levels and merge with previous line
+        console.log("deleting line");
         const deleteLineBreakOfPreviousLine = fromLine.number === 1 ? 0 : 1;
         changes.push({
           from: fromLine.from - deleteLineBreakOfPreviousLine,
