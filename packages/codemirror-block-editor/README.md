@@ -66,6 +66,9 @@ To increase or decrease a block level the extension adds or removes whitespace f
 ### Naming
 
 - **Block**: Section that may span multiple lines.
+- **Block Indentation**: Number of characters (including the _block marker_) before the actual _line content_ starts.
+- **Indentation per Level**: Number of characters that indicate one level. This is the length of a _block marker_ to keep _block indentation_ consistent throughout all _block lines_.
+- **Block Level**: Depth of an individual block. It is the _block indentation_ divided by the _indentation per level_.
 - **Block Marker**: Text that indicates a block. E.g. `- `.
 - **Block Line**: Any line within a block.
 - **Root Block Line**: Starting line of a block.

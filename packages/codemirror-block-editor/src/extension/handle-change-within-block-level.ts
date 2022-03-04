@@ -1,39 +1,66 @@
 import { EditorState } from "@codemirror/basic-setup";
-import { ChangeSpec } from "@codemirror/state";
+import { ChangeSpec, StateEffect } from "@codemirror/state";
 import { findBlockLevelOfLineNumberInDocument } from "./find-block-level-of-line";
+import { indentationPerLevelFacet } from "./indentation-per-level-facet";
+import { setBlockLevelEffect } from "./set-block-level-effect";
 
+/**
+ * Deviates block level changes from text changes and adds respective {@link setBlockLevelEffect} effects to the transaction.
+ */
 export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
   (transaction) => {
     const { doc } = transaction.startState;
     const changes: ChangeSpec[] = [];
+    const effects: StateEffect<unknown>[] = [];
+    const indentationPerLevel = transaction.startState.facet(
+      indentationPerLevelFacet
+    );
+
     transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
       const fromLine = doc.lineAt(fromA);
       // const toLine = doc.lineAt(toA);
       const fromLevel = findBlockLevelOfLineNumberInDocument(
-        transaction.startState.doc,
+        doc,
         fromLine.number
       );
       if (
-        fromA === fromLine.from &&
+        fromA === fromLine.from && // inserted in beginning
         fromA === toA && // inserted something
-        text.lines === 1 &&
-        !text.line(1).text.trim().length
+        text.lines === 1 && // change only in one line
+        !text.line(1).text.trim().length // added only spaces
       ) {
-        // whitespace got inserted at beginning of line
-        // => level increase
-        // TODO for child block increase parent block only
         console.log("level increased");
+        effects.push(
+          setBlockLevelEffect.of({
+            fromLevel: Math.floor(fromLevel / indentationPerLevel),
+            toLevel: Math.floor(
+              (fromLevel + text.line(1).length) / indentationPerLevel
+            ),
+            // TODO find block root line and set that one
+            lineNumber: fromLine.number,
+          })
+        );
         return transaction;
       }
 
+      const toLevel = toA - fromLine.from;
       if (
         fromB === toB && // deleted something
         text.lines === 1 &&
-        toA - fromLine.from < fromLevel
+        toLevel < fromLevel
       ) {
         // whitespace deleted in indentation
         // => level decrease
-        console.log("level decreased");
+        console.log(`level decreased from ${fromLevel} to ${toLevel}`);
+        effects.push(
+          setBlockLevelEffect.of({
+            // TODO calculate indentation and block level in separate function / component
+            fromLevel: Math.floor(fromLevel / indentationPerLevel),
+            toLevel: Math.floor(toLevel / indentationPerLevel),
+            // TODO find block root line and set that one
+            lineNumber: fromLine.number,
+          })
+        );
         return transaction;
       }
 
@@ -48,6 +75,14 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
         });
       }
     });
-    return [transaction, { changes, sequential: false }];
+
+    return [
+      transaction,
+      {
+        changes,
+        effects,
+        sequential: false,
+      },
+    ];
   }
 );

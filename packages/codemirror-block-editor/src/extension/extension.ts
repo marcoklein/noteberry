@@ -9,14 +9,22 @@ import { validateCursorPosition } from "./validate-cursor-position";
 export function blockLevelExtension(_options: {} = {}): Extension {
   return [
     // TODO there is a bug that changes precedence -> have to change order of extensions with that patch
+
+    // views
     dotWidgetViewPlugin,
+    dotTheme,
 
+    // listeners
+    notifyBlockLevelListeners,
+
+    // selection
     validateCursorPosition,
-    addBlockOnNewLine,
 
+    // changes
+    addBlockOnNewLine,
     handleChangeWithinBlockLevel,
 
-    dotTheme,
+    // keymap
     blockLevelKeymap,
   ];
 }
