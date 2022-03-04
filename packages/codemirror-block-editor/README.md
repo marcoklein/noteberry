@@ -18,7 +18,7 @@ Install dependencies
 yarn install
 ```
 
-Run the project
+Run the demo website
 
 ```bash
 yarn start
@@ -75,6 +75,14 @@ To increase or decrease a block level the extension adds or removes whitespace f
 - **Child Block Line**: Lines that precede the _Root Block Line_.
 - **Line Content**: The text of a line.
 - **Block Content**: All text lines of a block. E.g. the sum of all _line contents_.
+
+### Block Level Depth
+
+### Rendering Block Content
+
+The `setBlockContentViewFacet` sets a function to listen for block contents that shall be rendered.
+
+Only lines blocks that have no focus render. A block with focus shows its original text to allow seamless editing of the underlying text content.
 
 ## Learnings
 

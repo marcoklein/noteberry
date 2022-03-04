@@ -12,4 +12,8 @@ export const dotTheme = EditorView.baseTheme({
   ".cm-dot:hover": {
     backgroundColor: "#000",
   },
+  ".cm-wikilink": {
+    color: "#AA5555",
+    cursor: "pointer",
+  },
 });

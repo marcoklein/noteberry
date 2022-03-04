@@ -1,5 +1,7 @@
 import { Extension } from "@codemirror/state";
+import { blockRendererViewPlugin } from "../view/block-renderer-view-plugin";
 import { addBlockOnNewLine } from "./add-block-on-new-line";
+import { notifyBlockLevelListeners } from "./block-level-listener";
 import { dotWidgetViewPlugin } from "./dot-widget";
 import { handleChangeWithinBlockLevel } from "./handle-change-within-block-level";
 import { blockLevelKeymap } from "./keymap";
@@ -11,6 +13,7 @@ export function blockLevelExtension(_options: {} = {}): Extension {
     // TODO there is a bug that changes precedence -> have to change order of extensions with that patch
 
     // views
+    blockRendererViewPlugin,
     dotWidgetViewPlugin,
     dotTheme,
 
@@ -26,5 +29,8 @@ export function blockLevelExtension(_options: {} = {}): Extension {
 
     // keymap
     blockLevelKeymap,
+
+    // config
+    // indentationPerLevelFacet.of(2),
   ];
 }

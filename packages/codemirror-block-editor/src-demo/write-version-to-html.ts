@@ -1,4 +1,4 @@
-import { version } from "./version.gen";
+import { version } from "../src/version.gen";
 
 export function writeVersionToHtml() {
   const versionEl = document.getElementById("version");

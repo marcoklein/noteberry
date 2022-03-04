@@ -14,12 +14,12 @@
   "type": "module",
   "exports": "./dist/index.js",
   "scripts": {
-    "start": "parcel src/index.html",
+    "start": "parcel src-demo/index.html",
     "test": "yarn test:build && karma start karma.conf.cjs",
     "test:watch": "nodemon --exec \"yarn test\" --watch src --watch tests -e js,ts",
     "test:build": "rimraf dist-test/* && parcel build '(src|tests)/**/*.test.ts' --dist-dir dist-test --no-optimize",
-    "build": "yarn generate:version && parcel build src/index.html --public-url .",
-    "deploy": "yarn build && gh-pages -d ./dist",
+    "build:demo": "yarn generate:version && parcel build src-demo/index.html --public-url . --dist-dir dist-demo",
+    "deploy": "rimraf dist-demo && yarn build:demo && gh-pages -d ./dist-demo",
     "generate:version": "genversion src/version.gen.ts --es6",
     "postinstall": "yarn generate:version"
   },

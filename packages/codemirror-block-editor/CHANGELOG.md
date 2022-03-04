@@ -9,6 +9,8 @@
 
 - Writing events of block level changes to website
 - Link to open source page with GitHub badge
+- Move demo into separate folder
+- Add a view plugin to style `[[wikilinks]]`
 
 ## 0.5.0
 

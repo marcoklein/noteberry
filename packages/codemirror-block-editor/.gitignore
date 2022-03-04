@@ -5,3 +5,4 @@ dist
 .parcel-cache
 *.gen.ts
 dist-test
+dist-demo
