@@ -4,6 +4,39 @@ Creating indented list of blocks in [CodeMirror6](https://codemirror.net/6/).
 
 [Demo](https://marcoklein.github.io/codemirror-block-editor/)
 
+## Installation
+
+Install via NPM
+
+```sh
+npm install codemirror-block-editor
+```
+
+or yarn
+
+```sh
+yarn add codemirror-block-editor
+```
+
+## Usage
+
+Import the `blockEditor` extension and list it in the CodeMirror state `extensions` configuration:
+
+```ts
+import { basicSetup } from "@codemirror/basic-setup";
+import { blockEditor } from "codemirror-block-editor";
+
+const initialState = EditorState.create({
+  doc: "- Indent block with Tab",
+  extensions: [blockEditor(), basicSetup],
+});
+new EditorView({
+  state: initialState,
+});
+```
+
+# Development
+
 ## Prerequisite
 
 1. Clone this repository
@@ -24,6 +57,22 @@ Run the demo website
 yarn start
 ```
 
+## Building the demo
+
+Build demo source
+
+```bash
+yarn build:demo
+```
+
+> It is not possible to omit the package.json main field in the parcel CLI. As a fix to build tests the package.json is renamed to package.json.tmp for the build. See [here](https://parceljs.org/getting-started/library/) for more information.
+
+Deploy demo website on GitHub Pages
+
+```bash
+yarn deploy
+```
+
 ## Testing
 
 Run tests with
@@ -41,6 +90,16 @@ yarn test:watch
 > Currently, the testing approach is very basic. Parcel builds `*.test.ts` files and karma picks up build files to run tests. Therefore, there is no direct mapping to the TypeScript source. This is due to the complicated setup with ESM modules.
 
 > Additionally, it is not possible to omit the package.json main field in the parcel CLI. As a fix to build tests the package.json is renamed to package.json.tmp for the build. See [here](https://parceljs.org/getting-started/library/) for more information.
+
+## Releasing
+
+Update the `CHANGELOG.md` and bump the version in `package.json`.
+
+To release a package with the version listed in `package.json` run:
+
+```sh
+yarn release
+```
 
 ## Approach
 
@@ -88,33 +147,4 @@ Only lines blocks that have no focus render. A block with focus shows its origin
 
 ## Learnings
 
-There are several stages I went through while implementing the block indentation. They are all listed in the `learnings` folder.
-
-### 1
-
-- getting started with CodeMirror 6
-- implement a basic line decoration
-
-### 2
-
-- add some keymap to work with indentation
-
-### 3
-
-- implement more intelligent indentation logic
-- huge problem: cursor did not refresh when the line indentation (with `padding-left`) changed
-
-### 4
-
-- implement block levels in the editor
-- logic to override individual file changes
-- several very complicated re-writes
-- did not get me closer to what the project should do
-
-### 5
-
-- block levels base on the `padding-left` approach
-- fixed the cursor refresh issue form `3`rd approach
-- however, when copying or deleting the line the indentation got lost
-- it might be possible to modify to text when copying it into the clipboard
-- therefore, it might be the simplest solution to work with `spaces` or `tabs` as indentation and overwrite them with decorations
+There are several learnings I documented in the [learnings folder](./learnings/README.md)

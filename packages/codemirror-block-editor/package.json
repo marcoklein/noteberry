@@ -37,11 +37,13 @@
     "test:build": "rimraf dist-test/* && mv package.json package.json.tmp && parcel build '(src|tests)/**/*.test.ts' --dist-dir dist-test --no-optimize && mv package.json.tmp package.json",
     "check-typings": "tsc --noEmit",
     "build": "rimraf dist/* && parcel build --dist-dir dist",
-    "build:demo": "yarn generate:version && parcel build src-demo/index.html --public-url . --dist-dir dist-demo",
-    "deploy": "rimraf dist-demo && yarn build:demo && gh-pages -d ./dist-demo",
+    "build:demo": "yarn generate:version && mv package.json package.json.tmp && parcel build src-demo/index.html --public-url . --dist-dir dist-demo && mv package.json.tmp package.json",
+    "deploy": "rimraf dist-demo && mv package.json package.json.tmp && yarn build:demo &&  gh-pages -d ./dist-demo",
     "generate:version": "genversion src/version.gen.ts --es6",
+    "release": "yarn publish --non-interactive",
     "prepare": "yarn generate:version",
-    "prepublishOnly": "yarn test && yarn build"
+    "prepublishOnly": "yarn test && yarn build",
+    "postpublish": "git push origin --tags"
   },
   "devDependencies": {
     "@codemirror/basic-setup": "^0.19.1",

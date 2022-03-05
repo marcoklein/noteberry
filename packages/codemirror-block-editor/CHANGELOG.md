@@ -9,6 +9,7 @@
 
 - Fix export of module that prevented library build
 - Add prepare script to always run tests and build on publish
+- Fix build script for demo
 
 ## 0.7.1
 

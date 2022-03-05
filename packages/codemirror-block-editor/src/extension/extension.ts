@@ -8,7 +8,12 @@ import { blockLevelKeymap } from "./keymap";
 import { dotTheme } from "./theme";
 import { validateCursorPosition } from "./validate-cursor-position";
 
-export function blockLevelExtension(_options: {} = {}): Extension {
+/**
+ * Extension for CodeMirror6 to allow block-based editing.
+ *
+ * @returns Extension to enable a block editor.
+ */
+export function blockEditor(_options: {} = {}): Extension {
   return [
     // TODO there is a bug that changes precedence -> have to change order of extensions with that patch
 
