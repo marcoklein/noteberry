@@ -44,7 +44,7 @@
     "prepare": "yarn generate:version",
     "release:check": "node check-npm-registry-version.js",
     "prepublishOnly": "yarn release:check && yarn test && yarn build",
-    "postpublish": "git push origin --tags"
+    "postversion": "git push --follow-tags"
   },
   "devDependencies": {
     "@codemirror/basic-setup": "^0.19.1",
