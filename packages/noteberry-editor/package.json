@@ -12,6 +12,7 @@
     "prepare": "yarn generate:version"
   },
   "dependencies": {
+    "@codemirror/closebrackets": "^0.19.1",
     "@codemirror/commands": "^0.19.8",
     "@codemirror/fold": "^0.19.3",
     "@codemirror/history": "^0.19.2",
