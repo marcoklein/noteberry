@@ -20,7 +20,7 @@
   "files": [
     "dist/*"
   ],
-  "version": "0.7.1",
+  "version": "0.7.2",
   "author": {
     "name": "Marco Klein"
   },
@@ -30,7 +30,6 @@
   "main": "./dist/index.js",
   "exports": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "module": "./dist/module.js",
   "scripts": {
     "start": "parcel src-demo/index.html",
     "test": "yarn check-typings && yarn test:build && karma start karma.conf.cjs",
@@ -41,7 +40,8 @@
     "build:demo": "yarn generate:version && parcel build src-demo/index.html --public-url . --dist-dir dist-demo",
     "deploy": "rimraf dist-demo && yarn build:demo && gh-pages -d ./dist-demo",
     "generate:version": "genversion src/version.gen.ts --es6",
-    "postinstall": "yarn generate:version"
+    "prepare": "yarn generate:version",
+    "prepublishOnly": "yarn test && yarn build"
   },
   "devDependencies": {
     "@codemirror/basic-setup": "^0.19.1",

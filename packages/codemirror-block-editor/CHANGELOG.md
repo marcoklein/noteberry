@@ -5,6 +5,15 @@
 - Disable `Tab+ESC` escape hatch for vim compatibility
 - Improve testing pipeline by properly integrating the Karma runner
 
+## 0.7.2
+
+- Fix export of module that prevented library build
+- Add prepare script to always run tests and build on publish
+
+## 0.7.1
+
+- Add descriptions to package json for NPM registry
+
 ## 0.7.0
 
 - Rename project to `codemirror-block-editor`
