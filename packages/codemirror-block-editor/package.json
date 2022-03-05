@@ -28,7 +28,8 @@
     "build:demo": "yarn generate:version && parcel build src-demo/index.html --public-url . --dist-dir dist-demo",
     "deploy": "rimraf dist-demo && yarn build:demo && gh-pages -d ./dist-demo",
     "generate:version": "genversion src/version.gen.ts --es6",
-    "postinstall": "yarn generate:version"
+    "postinstall": "yarn generate:version",
+    "release": "release-it"
   },
   "devDependencies": {
     "@codemirror/basic-setup": "^0.19.1",
@@ -47,6 +48,7 @@
     "parcel": "^2.1.1",
     "process": "^0.11.10",
     "puppeteer": "^13.4.0",
+    "release-it": "^14.12.5",
     "rimraf": "^3.0.2",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
