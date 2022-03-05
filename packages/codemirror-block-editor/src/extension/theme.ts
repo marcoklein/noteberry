@@ -1,4 +1,4 @@
-import { EditorView } from "@codemirror/basic-setup";
+import { EditorView } from "@codemirror/view";
 
 export const dotTheme = EditorView.baseTheme({
   ".cm-dot": {

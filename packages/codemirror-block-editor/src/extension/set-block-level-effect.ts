@@ -3,7 +3,7 @@ import { StateEffect } from "@codemirror/state";
 /**
  * Issued if there is a change of a block level.
  */
-export type SetBlockLevelEffectSpec = {
+export type BlockLevelChangeEffectSpec = {
   /**
    * Previous level of block.
    */
@@ -19,7 +19,7 @@ export type SetBlockLevelEffectSpec = {
 };
 
 /**
- * Set block level on a line number.
+ * Block level effect that contains information about a level change.
  */
-export const setBlockLevelEffect =
-  StateEffect.define<SetBlockLevelEffectSpec>();
+export const blockLevelChangeEffect =
+  StateEffect.define<BlockLevelChangeEffectSpec>();

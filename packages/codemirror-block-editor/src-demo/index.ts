@@ -1,8 +1,7 @@
 import { basicSetup, EditorState, EditorView } from "@codemirror/basic-setup";
 import { vim } from "@replit/codemirror-vim";
 import { writeNotificationToHtml } from "./write-notifications";
-import { blockLevelExtension } from "../src/extension";
-import { setBlockLevelListenerFacet } from "../src/extension/block-level-listener";
+import { blockLevelListenerFacet, blockLevelExtension } from "../src";
 import { writeVersionToHtml } from "./write-version-to-html";
 
 writeVersionToHtml();
@@ -20,7 +19,7 @@ const initialState = EditorState.create({
     vim(),
     blockLevelExtension(),
     basicSetup,
-    setBlockLevelListenerFacet.of((effect) => {
+    blockLevelListenerFacet.of((effect) => {
       writeNotificationToHtml(JSON.stringify(effect));
     }),
   ],

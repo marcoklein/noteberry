@@ -1,7 +1,7 @@
 import { EditorState, basicSetup, EditorView } from "@codemirror/basic-setup";
 import { Extension } from "@codemirror/state";
 import { vim } from "@replit/codemirror-vim";
-import { blockLevelExtension } from "../src/extension";
+import { blockLevelExtension } from "../src";
 
 export function createTestEditorWithDoc(content: string) {
   let initialState = EditorState.create({

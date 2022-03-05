@@ -1,4 +1,4 @@
-import { EditorState, EditorView } from "@codemirror/basic-setup";
+import { EditorView } from "@codemirror/view";
 import { ChangeSpec } from "@codemirror/state";
 import { keymap } from "@codemirror/view";
 import {

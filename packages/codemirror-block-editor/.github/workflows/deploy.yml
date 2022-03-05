@@ -28,7 +28,7 @@ jobs:
       - run: yarn test
       - name: Publish to GitHub Pages
         run: |
-          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/marcoklein/codemirror6-block-indentation.git
+          git remote set-url origin https://git:${GITHUB_TOKEN}@github.com/marcoklein/codemirror-block-editor.git
           yarn deploy -u "github-actions-bot <support+actions@github.com>"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

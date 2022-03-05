@@ -1,8 +1,8 @@
-# CodeMirror6 Indentation
+# CodeMirror Block Editor Extension
 
-Creating indented list blocks in [CodeMirror6](https://codemirror.net/6/).
+Creating indented list of blocks in [CodeMirror6](https://codemirror.net/6/).
 
-[Demo](https://marcoklein.github.io/codemirror6-block-indentation/)
+[Demo](https://marcoklein.github.io/codemirror-block-editor/)
 
 ## Prerequisite
 
@@ -39,6 +39,8 @@ yarn test:watch
 ```
 
 > Currently, the testing approach is very basic. Parcel builds `*.test.ts` files and karma picks up build files to run tests. Therefore, there is no direct mapping to the TypeScript source. This is due to the complicated setup with ESM modules.
+
+> Additionally, it is not possible to omit the package.json main field in the parcel CLI. As a fix to build tests the package.json is renamed to package.json.tmp for the build. See [here](https://parceljs.org/getting-started/library/) for more information.
 
 ## Approach
 

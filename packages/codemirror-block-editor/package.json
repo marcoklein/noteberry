@@ -1,29 +1,40 @@
 {
-  "name": "codemirror6-block-indentation",
-  "description": "Playground project for code mirror 6.",
+  "name": "codemirror-block-editor",
+  "description": "A block-based editor extension for CodeMirror 6",
   "keywords": [
-    "code-mirror-6",
+    "CodeMirror",
     "TypeScript",
-    "ESM"
+    "JavaScript",
+    "BlockEditor"
   ],
-  "version": "0.6.0",
+  "version": "0.7.0",
   "author": {
     "name": "Marco Klein"
   },
   "license": "MIT",
   "type": "module",
+  "source": "./src/index.ts",
+  "main": "./dist/index.js",
   "exports": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/module.js",
   "scripts": {
     "start": "parcel src-demo/index.html",
-    "test": "yarn test:build && karma start karma.conf.cjs",
+    "test": "yarn check-typings && yarn test:build && karma start karma.conf.cjs",
     "test:watch": "nodemon --exec \"yarn test\" --watch src --watch tests -e js,ts",
-    "test:build": "rimraf dist-test/* && parcel build '(src|tests)/**/*.test.ts' --dist-dir dist-test --no-optimize",
+    "test:build": "rimraf dist-test/* && mv package.json package.json.tmp && parcel build '(src|tests)/**/*.test.ts' --dist-dir dist-test --no-optimize && mv package.json.tmp package.json",
+    "check-typings": "tsc --noEmit",
+    "build": "yarn check-typings && rimraf dist/* && parcel build --dist-dir dist",
     "build:demo": "yarn generate:version && parcel build src-demo/index.html --public-url . --dist-dir dist-demo",
     "deploy": "rimraf dist-demo && yarn build:demo && gh-pages -d ./dist-demo",
     "generate:version": "genversion src/version.gen.ts --es6",
     "postinstall": "yarn generate:version"
   },
   "devDependencies": {
+    "@codemirror/basic-setup": "^0.19.1",
+    "@parcel/packager-ts": "2.3.2",
+    "@parcel/transformer-typescript-types": "2.3.2",
+    "@types/jasmine": "^3.10.3",
     "concurrently": "^7.0.0",
     "genversion": "^3.0.2",
     "gh-pages": "^3.2.3",
@@ -41,13 +52,11 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@codemirror/basic-setup": "^0.19.1",
     "@codemirror/search": "^0.19.8",
     "@codemirror/state": "^0.19.9",
     "@codemirror/stream-parser": "^0.19.3",
     "@codemirror/text": "^0.19.5",
     "@codemirror/view": "^0.19.45",
-    "@replit/codemirror-vim": "^0.19.0",
-    "@types/jasmine": "^3.10.3"
+    "@replit/codemirror-vim": "^0.19.0"
   }
 }

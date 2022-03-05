@@ -1,8 +1,8 @@
-import { EditorState } from "@codemirror/basic-setup";
+import { EditorState } from "@codemirror/state";
 import { ChangeSpec, StateEffect } from "@codemirror/state";
 import { findBlockLevelOfLineNumberInDocument } from "./find-block-level-of-line";
 import { indentationPerLevelFacet } from "./indentation-per-level-facet";
-import { setBlockLevelEffect } from "./set-block-level-effect";
+import { blockLevelChangeEffect } from "./set-block-level-effect";
 
 /**
  * Deviates block level changes from text changes and adds respective {@link setBlockLevelEffect} effects to the transaction.
@@ -31,7 +31,7 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
       ) {
         console.log("level increased");
         effects.push(
-          setBlockLevelEffect.of({
+          blockLevelChangeEffect.of({
             fromLevel: Math.floor(fromLevel / indentationPerLevel),
             toLevel: Math.floor(
               (fromLevel + text.line(1).length) / indentationPerLevel
@@ -53,7 +53,7 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
         // => level decrease
         console.log(`level decreased from ${fromLevel} to ${toLevel}`);
         effects.push(
-          setBlockLevelEffect.of({
+          blockLevelChangeEffect.of({
             // TODO calculate indentation and block level in separate function / component
             fromLevel: Math.floor(fromLevel / indentationPerLevel),
             toLevel: Math.floor(toLevel / indentationPerLevel),

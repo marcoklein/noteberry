@@ -5,6 +5,14 @@
 - Disable `Tab+ESC` escape hatch for vim compatibility
 - Improve testing pipeline by properly integrating the Karma runner
 
+## 0.7.0
+
+- Rename project to `codemirror-block-editor`
+- Building TypeScript definitions and TypeScript library
+- Adjust test build script
+- Add release script
+- Exposing extension, listener, and effects
+
 ## 0.6.0
 
 - Writing events of block level changes to website

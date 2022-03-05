@@ -1,8 +1,8 @@
 import { createTestEditorWithExtensionsAndDoc } from "../../tests/test-utils.test";
 import { handleChangeWithinBlockLevel } from "./handle-change-within-block-level";
 import {
-  setBlockLevelEffect,
-  SetBlockLevelEffectSpec,
+  blockLevelChangeEffect,
+  BlockLevelChangeEffectSpec,
 } from "./set-block-level-effect";
 
 function createTestEditorWithDoc(content: string) {
@@ -33,8 +33,8 @@ describe("Handle Change within Block Level", () => {
     expect(transaction.state.doc.toJSON()).toEqual(["- a", "- b"]);
     expect(
       transaction.effects
-        .filter((effect) => effect.is(setBlockLevelEffect))
-        .map((effect) => effect.value as SetBlockLevelEffectSpec)
+        .filter((effect) => effect.is(blockLevelChangeEffect))
+        .map((effect) => effect.value as BlockLevelChangeEffectSpec)
     ).toEqual([
       {
         lineNumber: 2,
@@ -54,8 +54,8 @@ describe("Handle Change within Block Level", () => {
     expect(transaction.state.doc.toJSON()).toEqual(["  - a"]);
     expect(
       transaction.effects
-        .filter((effect) => effect.is(setBlockLevelEffect))
-        .map((effect) => effect.value as SetBlockLevelEffectSpec)
+        .filter((effect) => effect.is(blockLevelChangeEffect))
+        .map((effect) => effect.value as BlockLevelChangeEffectSpec)
     ).toEqual([
       {
         lineNumber: 1,
