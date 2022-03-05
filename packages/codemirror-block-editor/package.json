@@ -42,7 +42,8 @@
     "generate:version": "genversion src/version.gen.ts --es6",
     "release": "yarn publish --non-interactive",
     "prepare": "yarn generate:version",
-    "prepublishOnly": "node check-npm-registry-version.js && yarn test && yarn build",
+    "release:check": "node check-npm-registry-version.js",
+    "prepublishOnly": "yarn release:check && yarn test && yarn build",
     "postpublish": "git push origin --tags"
   },
   "devDependencies": {
