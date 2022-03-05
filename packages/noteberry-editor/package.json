@@ -2,12 +2,13 @@
   "name": "noteberry-editor",
   "version": "0.1.0",
   "description": "A block-based editor for linked markdown notes with VIM support.",
-  "main": "index.js",
   "author": "Marco Klein",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "start": "parcel serve src/index.html",
+    "build": "parcel build src/index.html --dist-dir ./dist",
+    "deploy": "rimraf dist/* && yarn build && gh-pages -d ./dist",
     "generate:version": "genversion src/version.gen.ts --es6",
     "prepare": "yarn generate:version"
   },
@@ -15,7 +16,11 @@
     "@codemirror/closebrackets": "^0.19.1",
     "@codemirror/commands": "^0.19.8",
     "@codemirror/fold": "^0.19.3",
+    "@codemirror/gutter": "^0.19.9",
+    "@codemirror/highlight": "^0.19.7",
     "@codemirror/history": "^0.19.2",
+    "@codemirror/language": "^0.19.8",
+    "@codemirror/matchbrackets": "^0.19.4",
     "@codemirror/search": "^0.19.9",
     "@codemirror/state": "^0.19.9",
     "@codemirror/stream-parser": "^0.19.7",
@@ -30,6 +35,8 @@
     "@types/react": "^17.0.39",
     "@types/react-dom": "^17.0.13",
     "genversion": "^3.0.2",
-    "parcel": "^2.3.2"
+    "gh-pages": "^3.2.3",
+    "parcel": "^2.3.2",
+    "rimraf": "^3.0.2"
   }
 }

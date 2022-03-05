@@ -6,3 +6,4 @@ Follow the SemVer specification.
 
 - Initial release
 - Setup of a simple editor application with multiple pages to edit
+- GitHub Pages deployment
