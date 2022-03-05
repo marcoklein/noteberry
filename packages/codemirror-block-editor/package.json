@@ -38,7 +38,7 @@
     "check-typings": "tsc --noEmit",
     "build": "rimraf dist/* && parcel build --dist-dir dist",
     "build:demo": "yarn generate:version && mv package.json package.json.tmp && parcel build src-demo/index.html --public-url . --dist-dir dist-demo && mv package.json.tmp package.json",
-    "deploy": "rimraf dist-demo && mv package.json package.json.tmp && yarn build:demo &&  gh-pages -d ./dist-demo",
+    "deploy": "rimraf dist-demo && yarn build:demo && gh-pages -d ./dist-demo",
     "generate:version": "genversion src/version.gen.ts --es6",
     "release": "yarn publish --non-interactive",
     "prepare": "yarn generate:version",

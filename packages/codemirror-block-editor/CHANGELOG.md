@@ -8,6 +8,7 @@
 ## 0.7.3
 
 - Add script to check for NPM registry version
+- Update Deployment scripts for CI
 
 ## 0.7.2
 
