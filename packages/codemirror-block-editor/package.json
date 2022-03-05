@@ -3,11 +3,24 @@
   "description": "A block-based editor extension for CodeMirror 6",
   "keywords": [
     "CodeMirror",
+    "CodeMirror6",
+    "Extension",
     "TypeScript",
     "JavaScript",
     "BlockEditor"
   ],
-  "version": "0.7.0",
+  "homepage": "https://github.com/marcoklein/codemirror-block-editor",
+  "bugs": {
+    "url": "https://github.com/marcoklein/codemirror-block-editor/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/marcoklein/codemirror-block-editor.git"
+  },
+  "files": [
+    "dist/*"
+  ],
+  "version": "0.7.1",
   "author": {
     "name": "Marco Klein"
   },
@@ -24,12 +37,11 @@
     "test:watch": "nodemon --exec \"yarn test\" --watch src --watch tests -e js,ts",
     "test:build": "rimraf dist-test/* && mv package.json package.json.tmp && parcel build '(src|tests)/**/*.test.ts' --dist-dir dist-test --no-optimize && mv package.json.tmp package.json",
     "check-typings": "tsc --noEmit",
-    "build": "yarn check-typings && rimraf dist/* && parcel build --dist-dir dist",
+    "build": "rimraf dist/* && parcel build --dist-dir dist",
     "build:demo": "yarn generate:version && parcel build src-demo/index.html --public-url . --dist-dir dist-demo",
     "deploy": "rimraf dist-demo && yarn build:demo && gh-pages -d ./dist-demo",
     "generate:version": "genversion src/version.gen.ts --es6",
-    "postinstall": "yarn generate:version",
-    "release": "release-it"
+    "postinstall": "yarn generate:version"
   },
   "devDependencies": {
     "@codemirror/basic-setup": "^0.19.1",
@@ -48,7 +60,6 @@
     "parcel": "^2.1.1",
     "process": "^0.11.10",
     "puppeteer": "^13.4.0",
-    "release-it": "^14.12.5",
     "rimraf": "^3.0.2",
     "ts-node": "^10.4.0",
     "typescript": "^4.5.4"
