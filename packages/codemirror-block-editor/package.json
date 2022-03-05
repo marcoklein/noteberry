@@ -20,7 +20,7 @@
   "files": [
     "dist/*"
   ],
-  "version": "0.7.2",
+  "version": "0.7.3",
   "author": {
     "name": "Marco Klein"
   },
@@ -42,7 +42,7 @@
     "generate:version": "genversion src/version.gen.ts --es6",
     "release": "yarn publish --non-interactive",
     "prepare": "yarn generate:version",
-    "prepublishOnly": "yarn test && yarn build",
+    "prepublishOnly": "node check-npm-registry-version.js && yarn test && yarn build",
     "postpublish": "git push origin --tags"
   },
   "devDependencies": {

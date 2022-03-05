@@ -5,6 +5,10 @@
 - Disable `Tab+ESC` escape hatch for vim compatibility
 - Improve testing pipeline by properly integrating the Karma runner
 
+## 0.7.3
+
+- Add script to check for NPM registry version
+
 ## 0.7.2
 
 - Fix export of module that prevented library build
