@@ -20,7 +20,7 @@ const req = request(
   },
   (result) => {
     console.log("Status Code: ", result.statusCode);
-    if (result.statusCode === 404) {
+    if (result.statusCode === 400) {
       console.log("Version does not exist.");
       process.exit(0);
     }
