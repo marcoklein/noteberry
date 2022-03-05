@@ -18,8 +18,8 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: ${{ matrix.node-version }}
-          cache: "yarn",
-          registry-url: 'https://registry.npmjs.org'
+          cache: "yarn"
+          registry-url: "https://registry.npmjs.org"
       - run: yarn install --frozen-lockfile
       - run: yarn test
       - name: Publish to GitHub Pages
