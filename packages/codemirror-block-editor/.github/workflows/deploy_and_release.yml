@@ -28,4 +28,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Release to NPM
-        run: yarn publish --otp ${{ secrets.NPM_PUBLISH_TOKEN }}
+        run: yarn release
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_TOKEN}}
