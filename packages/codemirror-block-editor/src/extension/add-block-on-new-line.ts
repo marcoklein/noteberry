@@ -6,7 +6,7 @@ import {
 
 export const addBlockOnNewLine = EditorState.transactionFilter.of(
   (transaction) => {
-    const doc = transaction.state.doc; // TODO change to newDoc
+    const doc = transaction.newDoc;
     const changes: ChangeSpec[] = [];
     transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
       const fromLine = doc.lineAt(fromA);
@@ -28,6 +28,7 @@ export const addBlockOnNewLine = EditorState.transactionFilter.of(
           );
           const numOfIndentationSpaces =
             line.text.length - line.text.trimLeft().length;
+          // TODO replace magic number 2 with Block Marker length
           const missingSpaces = shouldBlockLevel - numOfIndentationSpaces - 2;
           if (missingSpaces > -2) {
             changes.push({

@@ -5,6 +5,11 @@
 - Disable `Tab+ESC` escape hatch for vim compatibility
 - Improve testing pipeline by properly integrating the Karma runner
 
+## 0.7.5
+
+- Add Git Tag on release
+- Use newDoc in transaction
+
 ## 0.7.4
 
 - Setting registry url in CI to point to npm registry

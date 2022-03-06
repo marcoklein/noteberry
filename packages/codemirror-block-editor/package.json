@@ -20,7 +20,7 @@
   "files": [
     "dist/*"
   ],
-  "version": "0.7.4",
+  "version": "0.7.5",
   "author": {
     "name": "Marco Klein"
   },
@@ -44,7 +44,7 @@
     "prepare": "yarn generate:version",
     "release:check": "node check-npm-registry-version.js",
     "prepublishOnly": "yarn release:check && yarn test && yarn build",
-    "postversion": "git push --follow-tags"
+    "postversion": "git tag `yarn info codemirror-block-editor dist-tags.latest` && git push --follow-tags"
   },
   "devDependencies": {
     "@codemirror/basic-setup": "^0.19.1",

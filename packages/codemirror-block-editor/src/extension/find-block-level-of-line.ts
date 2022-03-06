@@ -55,6 +55,7 @@ export function findBlockLevelAndLineNumberOfLineNumberInDocument(
 }
 
 export function findBlockLevelCharacterIndentationOfLine(lineText: string) {
+  // TODO test pattern with start of line
   const index = lineText.indexOf(BLOCK_LEVEL_TEXT_PATTERN);
   if (index >= 0) {
     return index + 2;
