@@ -1,5 +1,6 @@
 import { EditorState } from "@codemirror/state";
 import { ChangeSpec, StateEffect } from "@codemirror/state";
+import { blockMarkerFacet } from "./block-marker-facet";
 import { findBlockLevelOfLineNumberInDocument } from "./find-block-level-of-line";
 import { indentationPerLevelFacet } from "./indentation-per-level-facet";
 import { blockLevelChangeEffect } from "./set-block-level-effect";
@@ -15,13 +16,15 @@ export const handleChangeWithinBlockLevel = EditorState.transactionFilter.of(
     const indentationPerLevel = transaction.startState.facet(
       indentationPerLevelFacet
     );
+    const blockMarker = transaction.startState.facet(blockMarkerFacet);
 
     transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
       const fromLine = doc.lineAt(fromA);
       // const toLine = doc.lineAt(toA);
       const fromLevel = findBlockLevelOfLineNumberInDocument(
         doc,
-        fromLine.number
+        fromLine.number,
+        blockMarker
       );
       if (
         fromA === fromLine.from && // inserted in beginning

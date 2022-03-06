@@ -1,5 +1,6 @@
 import { createTestEditorWithExtensionsAndDoc } from "../../tests/test-utils.test";
 import { addBlockOnNewLine } from "./add-block-on-new-line";
+import { blockMarkerFacet } from "./block-marker-facet";
 
 function createTestEditorWithDoc(content: string) {
   return createTestEditorWithExtensionsAndDoc([addBlockOnNewLine], content);
@@ -42,5 +43,18 @@ describe("Add Block on New Line", () => {
     view.dispatch(view.state.update({ changes }));
     // then
     expect(view.state.doc.toJSON()).toEqual(["- a", "- ", "- "]);
+  });
+
+  it("should add a new block with the correct marker", () => {
+    // given
+    const view = createTestEditorWithExtensionsAndDoc(
+      [blockMarkerFacet.of("+ "), addBlockOnNewLine],
+      "+ a"
+    );
+    // when
+    const changes = view.state.changes({ from: 3, insert: "\n" });
+    view.dispatch(view.state.update({ changes }));
+    // then
+    expect(view.state.doc.toJSON()).toEqual(["+ a", "+ "]);
   });
 });

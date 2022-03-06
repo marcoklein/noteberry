@@ -1,4 +1,5 @@
 import { EditorState } from "@codemirror/state";
+import { blockMarkerFacet } from "./block-marker-facet";
 import { findBlockLevelOfLineNumberInDocument } from "./find-block-level-of-line";
 
 /**
@@ -11,19 +12,22 @@ export const validateCursorPosition = EditorState.transactionFilter.of(
     const doc = transaction.newDoc;
     let selectionChange: { anchor: number; head: number } | undefined =
       undefined;
+    const blockMarker = transaction.startState.facet(blockMarkerFacet);
 
     for (const { head, anchor } of transaction.newSelection.ranges) {
       const headLine = doc.lineAt(head);
       const headBlockLevel = findBlockLevelOfLineNumberInDocument(
         doc,
-        headLine.number
+        headLine.number,
+        blockMarker
       );
       const headBlockEndIndex = headLine.from + headBlockLevel;
 
       const anchorLine = doc.lineAt(anchor);
       const anchorBlockLevel = findBlockLevelOfLineNumberInDocument(
         doc,
-        anchorLine.number
+        anchorLine.number,
+        blockMarker
       );
       const anchorBlockEndIndex = anchorLine.from + anchorBlockLevel;
 

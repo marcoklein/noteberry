@@ -5,6 +5,7 @@ import {
   findBlockLevelAndLineNumberOfLineNumberInDocument,
   findBlockLevelOfLineNumberInDocument,
 } from "./find-block-level-of-line";
+import { blockMarkerFacet } from "./block-marker-facet";
 
 /**
  * Adds a keymap to increase block level with `Tab` and decrease level with `Tab-Shift`.
@@ -31,10 +32,12 @@ function _dispatchBlockCommand(
       console.log("increase");
       changes.push({ from: line.from, insert: "  " });
     } else if (mode === "decrease") {
+      const blockMarker = view.state.facet(blockMarkerFacet);
       const { rootBlockLine, blockLevel } =
         findBlockLevelAndLineNumberOfLineNumberInDocument(
           view.state.doc,
-          line.number
+          line.number,
+          blockMarker
         );
 
       if (rootBlockLine && blockLevel - 2 > 0) {

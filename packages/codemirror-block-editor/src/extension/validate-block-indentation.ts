@@ -1,4 +1,5 @@
 import { EditorState, ChangeSpec } from "@codemirror/state";
+import { blockMarkerFacet } from "./block-marker-facet";
 import {
   findBlockLevelCharacterIndentationOfLine,
   findBlockLevelOfLineNumberInDocument,
@@ -8,6 +9,8 @@ export const validateBlockIndentation = EditorState.transactionFilter.of(
   (transaction) => {
     const doc = transaction.newDoc;
     const changes: ChangeSpec[] = [];
+    const blockMarker = transaction.startState.facet(blockMarkerFacet);
+
     transaction.changes.iterChanges((fromA, toA, fromB, toB, text) => {
       const fromLine = doc.lineAt(fromA);
       const toLine = doc.lineAt(toB);
@@ -19,12 +22,14 @@ export const validateBlockIndentation = EditorState.transactionFilter.of(
       ) {
         const line = doc.line(lineNumber);
         const blockLevelOfLine = findBlockLevelCharacterIndentationOfLine(
-          line.text
+          line.text,
+          blockMarker
         );
         if (blockLevelOfLine <= 0) {
           const shouldBlockLevel = findBlockLevelOfLineNumberInDocument(
             doc,
-            lineNumber
+            lineNumber,
+            blockMarker
           );
           const numOfIndentationSpaces =
             line.text.length - line.text.trimLeft().length;

@@ -11,7 +11,8 @@ export const BLOCK_LEVEL_TEXT_PATTERN = "- ";
  */
 export function findBlockLevelOfLineNumberInDocument(
   doc: Text,
-  lineNumber: number
+  lineNumber: number,
+  blockMarker: string
 ) {
   for (
     let currentLineNumber = lineNumber;
@@ -19,7 +20,8 @@ export function findBlockLevelOfLineNumberInDocument(
     currentLineNumber--
   ) {
     const blockLevel = findBlockLevelCharacterIndentationOfLine(
-      doc.line(currentLineNumber).text
+      doc.line(currentLineNumber).text,
+      blockMarker
     );
     if (blockLevel > 0) {
       return blockLevel;
@@ -31,7 +33,8 @@ export function findBlockLevelOfLineNumberInDocument(
 
 export function findBlockLevelAndLineNumberOfLineNumberInDocument(
   doc: Text,
-  lineNumber: number
+  lineNumber: number,
+  blockMarker: string
 ) {
   for (
     let currentLineNumber = lineNumber;
@@ -39,7 +42,8 @@ export function findBlockLevelAndLineNumberOfLineNumberInDocument(
     currentLineNumber--
   ) {
     const blockLevel = findBlockLevelCharacterIndentationOfLine(
-      doc.line(currentLineNumber).text
+      doc.line(currentLineNumber).text,
+      blockMarker
     );
     if (blockLevel > 0) {
       return {
@@ -54,9 +58,12 @@ export function findBlockLevelAndLineNumberOfLineNumberInDocument(
   };
 }
 
-export function findBlockLevelCharacterIndentationOfLine(lineText: string) {
+export function findBlockLevelCharacterIndentationOfLine(
+  lineText: string,
+  blockMarker: string
+) {
   // TODO test pattern with start of line
-  const index = lineText.indexOf(BLOCK_LEVEL_TEXT_PATTERN);
+  const index = lineText.indexOf(blockMarker);
   if (index >= 0) {
     return index + 2;
   }

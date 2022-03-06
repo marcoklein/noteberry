@@ -8,11 +8,13 @@ describe("Find Block Level of Line", () => {
     // when
     const lineWithBlock = findBlockLevelOfLineNumberInDocument(
       view.state.doc,
-      1
+      1,
+      "- "
     );
     const lineWithoutBlock = findBlockLevelOfLineNumberInDocument(
       view.state.doc,
-      2
+      2,
+      "- "
     );
     // then
     expect(lineWithBlock).toBe(2);
