@@ -5,6 +5,10 @@
 - Disable `Tab+ESC` escape hatch for vim compatibility
 - Improve testing pipeline by properly integrating the Karma runner
 
+## 0.7.6
+
+- Manual git tagging
+
 ## 0.7.5
 
 - Add Git Tag on release

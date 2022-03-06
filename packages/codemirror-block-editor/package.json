@@ -20,7 +20,7 @@
   "files": [
     "dist/*"
   ],
-  "version": "0.7.5",
+  "version": "0.7.6",
   "author": {
     "name": "Marco Klein"
   },
@@ -40,11 +40,11 @@
     "build:demo": "yarn generate:version && mv package.json package.json.tmp && parcel build src-demo/index.html --public-url . --dist-dir dist-demo && mv package.json.tmp package.json",
     "deploy": "rimraf dist-demo && yarn build:demo && gh-pages -d ./dist-demo",
     "generate:version": "genversion src/version.gen.ts --es6",
-    "release": "yarn publish --non-interactive --registry 'https://registry.npmjs.org/'",
+    "release": "yarn publish --non-interactive --registry 'https://registry.npmjs.org/' && yarn release:tag",
     "prepare": "yarn generate:version",
     "release:check": "node check-npm-registry-version.js",
     "prepublishOnly": "yarn release:check && yarn test && yarn build",
-    "postversion": "git tag `yarn info codemirror-block-editor dist-tags.latest` && git push --follow-tags"
+    "release:tag": "git tag `yarn info codemirror-block-editor dist-tags.latest` && git push --follow-tags"
   },
   "devDependencies": {
     "@codemirror/basic-setup": "^0.19.1",
