@@ -47,7 +47,10 @@
     "release:tag": "git tag v`yarn info codemirror-block-editor dist-tags.latest` && git push --follow-tags"
   },
   "devDependencies": {
-    "@codemirror/basic-setup": "^0.19.1",
+    "@codemirror/basic-setup": "^0.19.0",
+    "@codemirror/search": "^0.19.8",
+    "@codemirror/stream-parser": "^0.19.3",
+    "@replit/codemirror-vim": "^0.19.0",
     "@parcel/packager-ts": "2.3.2",
     "@parcel/transformer-typescript-types": "2.3.2",
     "@types/jasmine": "^3.10.3",
@@ -68,11 +71,8 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "@codemirror/search": "^0.19.8",
     "@codemirror/state": "^0.19.9",
-    "@codemirror/stream-parser": "^0.19.3",
-    "@codemirror/text": "^0.19.5",
-    "@codemirror/view": "^0.19.45",
-    "@replit/codemirror-vim": "^0.19.0"
+    "@codemirror/text": "^0.19.6",
+    "@codemirror/view": "^0.19.46"
   }
 }

@@ -8,6 +8,7 @@
 ## 0.8.0
 
 - Setting the block marker in facet
+- Fix demo by upgrading dependencies
 
 ## 0.7.7
 
