@@ -5,6 +5,7 @@ import {
   highlightActiveLine,
   dropCursor,
   EditorView,
+  ViewPlugin,
 } from "@codemirror/view";
 import { Extension, EditorState } from "@codemirror/state";
 import { history, historyKeymap } from "@codemirror/history";
@@ -29,12 +30,13 @@ import { useEffect, useRef } from "react";
 
 interface ComponentProps {
   lines: string[];
+  setLines: (lines: string[]) => void;
 }
 
 /**
  * Edit content of a page.
  */
-export function PageEditor({ lines }: ComponentProps) {
+export function PageEditor({ lines, setLines }: ComponentProps) {
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -72,6 +74,12 @@ export function PageEditor({ lines }: ComponentProps) {
           // ...completionKeymap,
           // ...lintKeymap,
         ]),
+        ViewPlugin.define(() => ({
+          update: (update) => {
+            console.log("update");
+            setLines(update.view.state.doc.toJSON());
+          },
+        })),
       ],
     });
     const view = new EditorView({
@@ -80,6 +88,7 @@ export function PageEditor({ lines }: ComponentProps) {
     });
 
     return () => {
+      console.log("destroy");
       view.destroy();
     };
   }, [containerRef, lines]);

@@ -1,8 +1,8 @@
 import React, { useCallback, useRef, useState } from "react";
 import { Navbar } from "./components/header/Navbar";
 import { Main } from "./components/main/Main";
-import { PageModel } from "./models/PageModel";
 import { Sidebar } from "./components/sidebar/Sidebar";
+import { PageModel } from "./models/PageModel";
 
 export function App() {
   const [activePage, setActivePage] = useState<string | undefined>(undefined);
@@ -18,7 +18,7 @@ export function App() {
       ...pages,
       {
         title,
-        lines: [`- ${title}`, ""],
+        lines: [`- ${title}`, "- "],
       },
     ]);
   }, [pages, setPages, untitledPageCount]);

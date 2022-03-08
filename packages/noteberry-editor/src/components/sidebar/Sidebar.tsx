@@ -1,4 +1,6 @@
+import React from "react";
 import { PageModel } from "../../models/PageModel";
+import { Analysis } from "./Analysis";
 
 interface ComponentProps {
   pages: PageModel[];
@@ -8,7 +10,7 @@ interface ComponentProps {
 
 export function Sidebar({ pages, addPage, selectPage }: ComponentProps) {
   return (
-    <div style={{ backgroundColor: "#AAA", width: "14rem", padding: "0.5rem" }}>
+    <div style={{ backgroundColor: "#AAA", width: "12rem", padding: "0.5rem" }}>
       <div>
         <h3 style={{ display: "inline" }}>All Pages</h3>
         <button style={{ float: "right" }} onClick={() => addPage()}>
@@ -26,6 +28,7 @@ export function Sidebar({ pages, addPage, selectPage }: ComponentProps) {
           </li>
         ))}
       </ul>
+      <Analysis pages={pages}></Analysis>
     </div>
   );
 }
