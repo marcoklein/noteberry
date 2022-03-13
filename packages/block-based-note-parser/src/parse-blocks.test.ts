@@ -67,7 +67,7 @@ describe("parse blocks", () => {
     ]);
   });
 
-  xit("should add child lines with non-standard indentation", () => {
+  it("should add child lines with non-standard indentation", () => {
     // given
     const content = ["- First Block", "Child Line", " Child Line B"].join("\n");
     // when
