@@ -10,42 +10,21 @@ interface BlockNode {
  */
 export function parseBlocks(content: string) {
   const lines = content.split(/\r?\n/);
-  // let currentLines: string[] = [];
-  // let currentLevel = 0;
-  // let currentChildren: ParseTreeNode[] = [
-  //   { lines: currentLines, children: [] },
-  // ];
-  // let currentNode: ParseTreeNode = {
-  //   children: currentChildren,
-  //   lines: currentLines,
-  // };
-  // let levelStack: ParseTreeNode[] = [currentNode];
-  // let parseTree: NodeChildren = { children: [currentNode] };
-
+  const indentationLengthPerLevel = 2;
   const stack: BlockNode[] = [];
   let parsedFirstLineWithBlockMarker = false;
-  lines.forEach((line, lineIndex) => {
-    const lineNumber = lineIndex + 1;
+  lines.forEach((line) => {
     const blockMarkerResult = /^\W*- /.exec(line);
     if (blockMarkerResult) {
       parsedFirstLineWithBlockMarker = true;
-      // block marker
       const blockIndentation = blockMarkerResult[0].length;
       const blockLineContent = line.substr(blockIndentation);
-      const level = blockIndentationToBlockLevel(blockIndentation);
-      // push new line to stack
-      const blockNode: BlockNode = { level, lines: [blockLineContent] };
-      stack.push(blockNode);
+      const level = blockIndentationToBlockLevel(
+        blockIndentation,
+        indentationLengthPerLevel
+      );
+      stack.push({ level, lines: [blockLineContent] });
     } else {
-      // no block marker
-      // TODO what if this is the first block to add?
-      if (parsedFirstLineWithBlockMarker) {
-      }
-
-      // const lineSpaceIndentation = /^\W*/.exec(line);
-      let lineContentWithoutIndentation = line;
-      // lineContentWithoutIndentation =
-
       if (!stack.length) {
         stack.push({
           level: 1,
@@ -53,6 +32,15 @@ export function parseBlocks(content: string) {
         });
       } else {
         const currentBlockNode = stack[stack.length - 1];
+        // TODO could optimize by considering spaces of the blockMarkerResult
+        const lineSpaceIndentation = /^\W*/.exec(line)?.[0].length ?? 0;
+        const lineContentWithoutIndentation = getLineContentWithoutIndentation(
+          currentBlockNode,
+          line,
+          lineSpaceIndentation,
+          parsedFirstLineWithBlockMarker,
+          indentationLengthPerLevel
+        );
         currentBlockNode.lines.push(lineContentWithoutIndentation);
       }
     }
@@ -62,7 +50,25 @@ export function parseBlocks(content: string) {
 
 function blockIndentationToBlockLevel(
   blockIndentation: number,
-  indentationLengthPerLevel = 2
+  indentationLengthPerLevel: number
 ) {
   return Math.min(blockIndentation / indentationLengthPerLevel);
+}
+
+function getLineContentWithoutIndentation(
+  currentBlockNode: BlockNode,
+  line: string,
+  lineSpaceIndentation: number,
+  parsedFirstLineWithBlockMarkerFlag: boolean,
+  indentationLengthPerLevel: number
+) {
+  if (parsedFirstLineWithBlockMarkerFlag) {
+    return line.substr(
+      Math.min(
+        lineSpaceIndentation,
+        currentBlockNode.level * indentationLengthPerLevel
+      )
+    );
+  }
+  return line;
 }
