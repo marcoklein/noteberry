@@ -10,13 +10,7 @@
     "test": "mocha --loader=ts-node/esm src/**/*.test.ts tests/**/*.test.ts",
     "test:watch": "nodemon --exec \"yarn test\" --watch src --watch tests -e js,ts,md"
   },
-  "dependencies": {
-    "@types/jest": "^27.4.1",
-    "remark-parse": "^10.0.1",
-    "remark-wiki-link": "^1.0.4",
-    "unist-util-visit": "^4.1.0",
-    "unist-util-visit-parents": "^5.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@types/chai": "^4.3.0",
     "@types/mocha": "^9.1.0",
