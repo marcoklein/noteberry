@@ -1,5 +1,5 @@
 {
-  "name": "block-based-notes-parser",
+  "name": "block-based-note-parser",
   "version": "0.1.0",
   "description": "Parser for block-based notes.",
   "main": "index.js",
