@@ -1,6 +1,6 @@
-# Block-based Notes Parser
+# Block-based Note Parser
 
-Parse block-based Markdown content into a concrete syntax tree to work with block based notes.
+Handling hierarchal blocks of text content.
 
 ```md
 - This is a Block
@@ -27,9 +27,9 @@ will get
 
 And
 
-```md
+```
 - Block
-  no intend
+no intend
 ```
 
 will get
