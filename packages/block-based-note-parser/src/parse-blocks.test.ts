@@ -1,52 +1,56 @@
 import { parseBlocks } from "./parse-blocks.js";
 import { expect } from "chai";
+import { BlockSyntaxTreeBuilder } from "./syntax-tree-builder.js";
 
 describe("parse blocks", () => {
-  it("should parse simple blocks", () => {
+  it("should parse a single line", () => {
     // given
-    const content = ["- First Block", "  - Second Block"].join("\n");
+    const content = ["- First Block"].join("\n");
+    const expectedSyntaxTree = new BlockSyntaxTreeBuilder().newBlock(
+      1,
+      2,
+      "First Block"
+    );
     // when
     const result = parseBlocks(content);
     // then
-    expect(result).to.deep.equal([
-      {
-        level: 1,
-        lines: ["First Block"],
-      },
-      {
-        level: 2,
-        lines: ["Second Block"],
-      },
-    ]);
+    expect(result).to.deep.equal(expectedSyntaxTree.syntaxTree());
+  });
+
+  it("should parse simple blocks", () => {
+    // given
+    const content = ["- First Block", "  - Second Block"].join("\n");
+    const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
+      .newBlock(1, 2, "First Block")
+      .newBlock(2, 4, "Second Block");
+    // when
+    const result = parseBlocks(content);
+    // then
+    expect(result).to.deep.equal(expectedSyntaxTree.syntaxTree());
   });
 
   it("should add lines with no line marker to a level of 1", () => {
     // given
     const content = ["No Level", "- First Block"].join("\n");
+    const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
+      .newBlock(1, 0, "No Level")
+      .newBlock(1, 2, "First Block");
     // when
     const result = parseBlocks(content);
     // then
-    expect(result).to.deep.equal([
-      {
-        level: 1,
-        lines: ["No Level"],
-      },
-      { level: 1, lines: ["First Block"] },
-    ]);
+    expect(result).to.deep.equal(expectedSyntaxTree.syntaxTree());
   });
 
   it("should consider spaces of initial child lines for line with no block marker", () => {
     // given
     const content = ["No Level", " Line with Space"].join("\n");
+    const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
+      .newBlock(1, 0, "No Level")
+      .newBlockLine(0, " Line with Space");
     // when
     const result = parseBlocks(content);
     // then
-    expect(result).to.deep.equal([
-      {
-        level: 1,
-        lines: ["No Level", " Line with Space"],
-      },
-    ]);
+    expect(result).to.deep.equal(expectedSyntaxTree.syntaxTree());
   });
 
   it("should add child lines to the current block", () => {
@@ -56,28 +60,38 @@ describe("parse blocks", () => {
       "  Child Line",
       "    Child Line With Spaces",
     ].join("\n");
+    const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
+      .newBlock(1, 2, "First Block")
+      .newBlockLine(2, "Child Line")
+      .newBlockLine(2, "  Child Line With Spaces");
     // when
     const result = parseBlocks(content);
     // then
-    expect(result).to.deep.equal([
-      {
-        level: 1,
-        lines: ["First Block", "Child Line", "  Child Line With Spaces"],
-      },
-    ]);
+    expect(result).to.deep.equal(expectedSyntaxTree.syntaxTree());
   });
 
   it("should add child lines with non-standard indentation", () => {
     // given
     const content = ["- First Block", "Child Line", " Child Line B"].join("\n");
+    const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
+      .newBlock(1, 2, "First Block")
+      .newBlockLine(0, "Child Line")
+      .newBlockLine(1, "Child Line B");
     // when
     const result = parseBlocks(content);
     // then
-    expect(result).to.deep.equal([
-      {
-        level: 1,
-        lines: ["First Block", "Child Line", "Child Line B"],
-      },
-    ]);
+    expect(result).to.deep.equal(expectedSyntaxTree.syntaxTree());
+  });
+
+  it("should parse content with arbitrary indentation", () => {
+    // given
+    const content = ["    - First Block", "Child Line"].join("\n");
+    const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
+      .newBlock(3, 6, "First Block")
+      .newBlockLine(0, "Child Line");
+    // when
+    const result = parseBlocks(content);
+    // then
+    expect(result).to.deep.equal(expectedSyntaxTree.syntaxTree());
   });
 });

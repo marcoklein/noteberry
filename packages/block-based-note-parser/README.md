@@ -1,6 +1,7 @@
 # Block-based Note Parser
 
 Handling hierarchal blocks of text content.
+Using the [unist syntax tree](https://github.com/syntax-tree/unist) specification.
 
 ```md
 - This is a Block
