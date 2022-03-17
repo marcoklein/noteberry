@@ -57,3 +57,23 @@ will get
 - Block
   no intend
 ```
+
+# Development
+
+Run tests
+
+```bash
+yarn test
+```
+
+Run tests in watch mode
+
+```bash
+yarn test:watch
+```
+
+Release with
+
+```bash
+yarn release
+```
