@@ -3,7 +3,10 @@
 ## Unreleased
 
 - Disable `Tab+ESC` escape hatch for vim compatibility
-- Improve testing pipeline by properly integrating the Karma runner
+
+## 0.9.0
+
+- Adding a view plugin to replace text with HTML nodes
 
 ## 0.8.0
 

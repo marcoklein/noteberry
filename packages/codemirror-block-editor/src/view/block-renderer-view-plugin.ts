@@ -6,9 +6,25 @@ import {
   ViewPlugin,
   ViewUpdate,
 } from "@codemirror/view";
+import { parseBlocks } from "block-based-note-parser";
 
-export const setBlockContentViewFacet =
-  Facet.define<(blockContent: Text) => void>();
+/**
+ * Data for a block.
+ */
+export interface BlockModel {
+  content: Text;
+  mode: "edit" | "view";
+}
+
+/**
+ * Define decorations for a specific block content.
+ * The given `blockContent` excludes any indentation.
+ *
+ * The function maps from and to positions of the decoration range to the original document.
+ * This means, that you must only consider the positions within the provided `blockContent`.
+ */
+export const blockDecorationFacet =
+  Facet.define<(blockContent: Text) => Range<Decoration>[]>();
 
 export const blockRendererViewPlugin = ViewPlugin.fromClass(
   class {
@@ -24,61 +40,38 @@ export const blockRendererViewPlugin = ViewPlugin.fromClass(
           lineNumber++
         ) {
           const line = update.view.state.doc.line(lineNumber);
-          const blockMarkerIndex = line.text.indexOf("- ");
 
-          // TODO parse block content
-          const regex = /\[\[([^\]]*)\]\]/g;
-          let result: RegExpExecArray | null;
-          while ((result = regex.exec(line.text)) !== null) {
-            let matchIndex = result.index;
-            let t = result[0].length;
-            tempDecos.push(
-              Decoration.mark({
-                inclusive: false,
-                class: "cm-wikilink",
-              }).range(line.from + matchIndex, line.from + matchIndex + t)
-            );
+          const blockDecorators = update.state.facet(blockDecorationFacet);
+          // currently a block can only have one line of text
+          // TODO exclude line marker and indentation from text and add that offset after plugin evaluation
+          const blockSyntaxTree = parseBlocks(line.text);
+          let indentation = 0;
+          let blockContent = "";
+          if (blockSyntaxTree.children[0].type === "Block") {
+            indentation =
+              blockSyntaxTree.children[0].children[0].data.indentation.value;
+            blockContent =
+              blockSyntaxTree.children[0].children[0].data.content.value;
           }
+          const blockText = Text.of([blockContent]);
+          if (!blockContent.length) continue;
+          blockDecorators.forEach((blockDecorator) => {
+            const decorations = blockDecorator(blockText).map((range) => {
+              const decoration = range.value;
+              // TODO replace range for multiple lines
+              return decoration.range(
+                range.from + line.from + indentation,
+                range.to + line.from + indentation
+              );
+            });
+            tempDecos.push(...decorations);
+          });
         }
       }
-      this.decorations = Decoration.set(tempDecos);
+      this.decorations = Decoration.set(tempDecos, true);
     }
   },
   {
     decorations: (v) => v.decorations,
-    eventHandlers: {
-      mousedown: (e, view) => {
-        let target = e.target as HTMLElement;
-        const line = view.state.doc.lineAt(view.posAtDOM(target));
-        // console.log(target.nodeName);
-        if (target.classList.contains("cm-wikilink")) {
-          console.log("pressed wikilink");
-        }
-      },
-      mousemove: (e, view) => {
-        let target = e.target as HTMLElement;
-        // const line = view.state.doc.lineAt(view.posAtDOM(target));
-        // console.log("mouse move on", line);
-        // e.preventDefault();
-      },
-      dragstart: (e, view) => {
-        let target = e.target as HTMLElement;
-        // const line = view.state.doc.lineAt(view.posAtDOM(target));
-        // console.log("mouse drag", line.number);
-        // e.preventDefault();
-      },
-      drag: (e, view) => {
-        let target = e.target as HTMLElement;
-        // const line = view.state.doc.lineAt(view.posAtDOM(target));
-        // console.log(" drag", line.number);
-        // e.preventDefault();
-      },
-      dragenter: (e, view) => {
-        let target = e.target as HTMLElement;
-        // const line = view.state.doc.lineAt(view.posAtDOM(target));
-        // console.log("enter", line.number);
-        // e.preventDefault();
-      },
-    },
   }
 );

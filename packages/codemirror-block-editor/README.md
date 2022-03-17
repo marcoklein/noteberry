@@ -1,8 +1,12 @@
 # CodeMirror Block Editor Extension
 
-Creating indented list of blocks in [CodeMirror6](https://codemirror.net/6/).
+Plugin for [CodeMirror6](https://codemirror.net/6/) to edit hierarchical content blocks.
 
 [Demo](https://marcoklein.github.io/codemirror-block-editor/)
+
+## What is a Block?
+
+A block is a piece of content that has a certain indentation. The content might span multiple lines and all lines have the same indentation. Blocks allow natural ordering of thoughts.
 
 ## Installation
 
@@ -101,15 +105,24 @@ To release a package with the version listed in `package.json` run:
 yarn release
 ```
 
-## Approach
+## Concept & Implementation
 
-### Implementation
+### Approach
 
 Handle only text changes to stay compatible with the VIM plugin and Codemirror text history. This means, if you want to indent a block you insert two spaces to the start of the line. That is how the VIM plugin would do it with the `>` key in visual mode.
 
 Raw text is parsed and decorations replace the `- ` string with a visual dot. Therefore, if you copy text text underlying text get copied which is very easy to handle.
 
 Custom implementation builds on the auto indentation of blocks and the deletion of blocks when the user deletes a character from the block indentation.
+
+### Edit and View Mode
+
+The block editor is text based. However, to create more sophisticated views, show images, and render custom graphics the editor provides two types of modes:
+
+1. The _edit mode_: is activated when you focus a block. Then only raw text shows up for you to manipulate. There are still some features that work within edit mode. For example, syntax highlighting of markdown input is still available. However, images and other graphical elements do not show but only their underlying text definition.
+2. The _view mode_: is activated when there is no focus on a block. This allows insertion of custom HTML elements that could render whatever you want. For example, images are rendered in the view mode.
+
+This setup has the advantage of a superior editing experience (also think about key bindings like VIM), paired with unique and custom visualizations.
 
 ### Limiting interactions by limiting selections
 
@@ -135,7 +148,7 @@ To increase or decrease a block level the extension adds or removes whitespace f
 - **Root Block Line**: Starting line of a block.
 - **Child Block Line**: Lines that precede the _Root Block Line_.
 - **Line Content**: The text of a line.
-- **Block Content**: All text lines of a block. E.g. the sum of all _line contents_.
+- **Block Content**: All text lines of a block. E.g. the sum of all _line contents_. This excludes any indentation.
 
 ### Block Level Depth
 
