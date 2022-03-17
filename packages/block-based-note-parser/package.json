@@ -11,7 +11,7 @@
     "test:watch": "nodemon --exec \"yarn test\" --watch src --watch tests -e js,ts,md",
     "build": "rimraf dist/* && tsc",
     "prepublishOnly": "yarn test && yarn build",
-    "release": "release-it"
+    "release": "yarn publish --non-interactive --registry 'https://registry.npmjs.org/'"
   },
   "files": [
     "dist/*"
