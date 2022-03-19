@@ -7,17 +7,11 @@
   ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "clean": "rimraf \"./packages/*/dist*\"",
-    "prepare": "yarn bootstrap",
-    "build": "lerna run build",
-    "deploy:docs": "lerna run --scope @deployment/docs deploy:docs"
+    "prepare": "yarn build && yarn bootstrap",
+    "build": "lerna run build --ignore @deployment/*",
+    "deploy:docs": "yarn build && yarn bootstrap && lerna run --scope @deployment/docs deploy:docs"
   },
   "devDependencies": {
-    "@types/node": "^17.0.21",
-    "copyfiles": "^2.4.1",
-    "lerna": "^4.0.0",
-    "rimraf": "^3.0.2",
-    "typescript": "^4.6.2",
-    "ts-node": "^10.7.0"
+    "lerna": "^4.0.0"
   }
 }
