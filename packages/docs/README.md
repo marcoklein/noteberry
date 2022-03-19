@@ -18,7 +18,7 @@ Build with
 yarn build
 ```
 
-Run an http server on the dist folder to see the final output
+Run an http server on the `dist` folder to see the final output
 
 ```bash
 npx http-server dist
