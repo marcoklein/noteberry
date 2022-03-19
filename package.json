@@ -8,7 +8,7 @@
   "scripts": {
     "bootstrap": "lerna bootstrap",
     "build": "lerna run build --ignore @deployment/*",
-    "deploy:docs": "yarn bootstrap && lerna run --scope @deployment/docs deploy:docs"
+    "deploy:docs": "yarn build && yarn bootstrap && lerna run --scope @deployment/docs deploy:docs"
   },
   "devDependencies": {
     "lerna": "^4.0.0"
