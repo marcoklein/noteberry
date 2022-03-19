@@ -1,19 +1,10 @@
 import { basicSetup, EditorState, EditorView } from "@codemirror/basic-setup";
-import {
-  HighlightStyle,
-  tags,
-  TagStyle,
-  defaultHighlightStyle,
-} from "@codemirror/highlight";
+import { Decoration, Range, WidgetType } from "@codemirror/view";
 import { vim } from "@replit/codemirror-vim";
+import { blockEditor, blockLevelListenerFacet } from "../src";
+import { blockDecorationFacet } from "../src/view/block-renderer-view-plugin";
 import { writeNotificationToHtml } from "./write-notifications";
-import { blockLevelListenerFacet, blockEditor } from "../src";
 import { writeVersionToHtml } from "./write-version-to-html";
-import {
-  blockDecorationFacet,
-  blockRendererViewPlugin,
-} from "../src/view/block-renderer-view-plugin";
-import { Decoration, DecorationSet, Range, WidgetType } from "@codemirror/view";
 
 writeVersionToHtml();
 
@@ -58,10 +49,10 @@ const initialState = EditorState.create({
     blockLevelListenerFacet.of((effect) => {
       writeNotificationToHtml(JSON.stringify(effect));
     }),
-    blockDecorationFacet.of((text) => {
+    blockDecorationFacet.of((blockInfo) => {
       // TODO support multiple lines
       // TODO this should support existing language plugins of codemirror!!!
-      const line = text.line(1);
+      const line = blockInfo.content.line(1);
       const regex = /\[\[([^\]]*)\]\]/g;
       let result: RegExpExecArray | null;
       const tempDecos: Range<Decoration>[] = [];
@@ -81,18 +72,20 @@ const initialState = EditorState.create({
           attributes: {
             style: "display: inline",
           },
-          tagName: "h2",
+          tagName: "h3",
         }).range(line.from, line.to)
       );
-      tempDecos.push(
-        Decoration.replace({
-          inclusive: true,
-          block: false,
-          widget: new DemoWidget(line.text),
-          inclusiveEnd: true,
-          inclusiveStart: true,
-        }).range(line.from, line.to)
-      );
+      if (blockInfo.hasFocus) {
+        tempDecos.push(
+          Decoration.replace({
+            inclusive: true,
+            block: false,
+            widget: new DemoWidget(line.text),
+            inclusiveEnd: true,
+            inclusiveStart: true,
+          }).range(line.from, line.to)
+        );
+      }
       return tempDecos;
     }),
     EditorView.baseTheme({
