@@ -7,7 +7,6 @@
   ],
   "scripts": {
     "bootstrap": "lerna bootstrap",
-    "prepare": "yarn build && yarn bootstrap",
     "build": "lerna run build --ignore @deployment/*",
     "deploy:docs": "yarn build && yarn bootstrap && lerna run --scope @deployment/docs deploy:docs"
   },
