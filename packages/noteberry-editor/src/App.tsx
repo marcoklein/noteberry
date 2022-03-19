@@ -1,16 +1,23 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Navbar } from "./components/header/Navbar";
 import { Main } from "./components/main/Main";
 import { Sidebar } from "./components/sidebar/Sidebar";
 import { PageModel } from "./models/PageModel";
 
 export function App() {
+  const params = useParams();
+  const navigateTo = useNavigate();
   const [activePage, setActivePage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState<PageModel[]>([
     { title: "Ma first page", lines: ["- Ma first page", "- is", "- cool"] },
     { title: "Ma second page", lines: ["- Ma second page", "- is", "- cool"] },
   ]);
   const untitledPageCount = useRef(1);
+
+  useEffect(() => {
+    setActivePage(params.noteId);
+  }, [params, setActivePage]);
 
   const addPage = useCallback(() => {
     const title = `Untitled Page ${untitledPageCount.current++}`;
@@ -27,7 +34,7 @@ export function App() {
     (title: string) => {
       const page = pages.find((page) => page.title === title);
       if (!page) console.warn(`No page with title "${title}" existing.`);
-      setActivePage(title);
+      navigateTo(`/${title}`);
     },
     [pages, setActivePage]
   );
