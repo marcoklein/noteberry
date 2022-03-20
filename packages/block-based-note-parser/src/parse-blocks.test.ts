@@ -8,7 +8,7 @@ describe("parse blocks", () => {
     const content = ["- First Block"].join("\n");
     const expectedSyntaxTree = new BlockSyntaxTreeBuilder().newBlock(
       1,
-      2,
+      "- ",
       "First Block"
     );
     // when
@@ -21,8 +21,8 @@ describe("parse blocks", () => {
     // given
     const content = ["- First Block", "  - Second Block"].join("\n");
     const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
-      .newBlock(1, 2, "First Block")
-      .newBlock(2, 4, "Second Block");
+      .newBlock(1, "- ", "First Block")
+      .newBlock(2, "  - ", "Second Block");
     // when
     const result = parseBlocks(content);
     // then
@@ -33,8 +33,8 @@ describe("parse blocks", () => {
     // given
     const content = ["No Level", "- First Block"].join("\n");
     const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
-      .newBlock(1, 0, "No Level")
-      .newBlock(1, 2, "First Block");
+      .newBlock(1, "", "No Level")
+      .newBlock(1, "- ", "First Block");
     // when
     const result = parseBlocks(content);
     // then
@@ -45,8 +45,8 @@ describe("parse blocks", () => {
     // given
     const content = ["No Level", " Line with Space"].join("\n");
     const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
-      .newBlock(1, 0, "No Level")
-      .newBlockLine(0, " Line with Space");
+      .newBlock(1, "", "No Level")
+      .newBlockLine("", " Line with Space");
     // when
     const result = parseBlocks(content);
     // then
@@ -61,9 +61,9 @@ describe("parse blocks", () => {
       "    Child Line With Spaces",
     ].join("\n");
     const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
-      .newBlock(1, 2, "First Block")
-      .newBlockLine(2, "Child Line")
-      .newBlockLine(2, "  Child Line With Spaces");
+      .newBlock(1, "- ", "First Block")
+      .newBlockLine("  ", "Child Line")
+      .newBlockLine("  ", "  Child Line With Spaces");
     // when
     const result = parseBlocks(content);
     // then
@@ -74,9 +74,9 @@ describe("parse blocks", () => {
     // given
     const content = ["- First Block", "Child Line", " Child Line B"].join("\n");
     const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
-      .newBlock(1, 2, "First Block")
-      .newBlockLine(0, "Child Line")
-      .newBlockLine(1, "Child Line B");
+      .newBlock(1, "- ", "First Block")
+      .newBlockLine("", "Child Line")
+      .newBlockLine(" ", "Child Line B");
     // when
     const result = parseBlocks(content);
     // then
@@ -87,8 +87,8 @@ describe("parse blocks", () => {
     // given
     const content = ["    - First Block", "Child Line"].join("\n");
     const expectedSyntaxTree = new BlockSyntaxTreeBuilder()
-      .newBlock(3, 6, "First Block")
-      .newBlockLine(0, "Child Line");
+      .newBlock(3, "    - ", "First Block")
+      .newBlockLine("", "Child Line");
     // when
     const result = parseBlocks(content);
     // then

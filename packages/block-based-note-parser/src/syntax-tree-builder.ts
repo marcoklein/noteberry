@@ -1,4 +1,3 @@
-import { Position } from "unist";
 import { Block, BlockList } from "./block-node";
 const LINE_BREAK_LENGTH = 1;
 
@@ -33,52 +32,50 @@ export class BlockSyntaxTreeBuilder {
   }
 
   private emptyBlockList(): BlockList {
-    return { children: [], type: "BlockList" };
+    return { children: [], type: "blockList" };
   }
 
   newEmptyLine() {
     throw new Error("Not implemented yet.");
   }
 
-  newBlock(level: number, indentation: number, lineContent: string) {
+  newBlock(level: number, indentationText: string, lineContent: string) {
     this.lastOffset += LINE_BREAK_LENGTH;
     const lineNumber = this.blocks.children.length + 1;
     const lineContentLength = lineContent.length;
+    const indentationLength = indentationText.length;
     const block: Block = {
-      type: "Block",
-      data: {
-        level: level,
-      },
+      type: "block",
+      level,
       children: [
         {
-          type: "RootBlockLine",
-          data: {
-            indentation: {
-              type: "BlockLineIndentation",
-              value: indentation,
-              position: {
-                start: { column: 1, line: lineNumber, offset: this.lastOffset },
-                end: {
-                  column: 1,
-                  line: lineNumber,
-                  offset: (this.lastOffset += indentation),
-                },
+          type: "rootBlockLine",
+          indentation: {
+            type: "blockLineIndentation",
+            indentation: indentationLength,
+            value: indentationText,
+            position: {
+              start: { column: 1, line: lineNumber, offset: this.lastOffset },
+              end: {
+                column: 1,
+                line: lineNumber,
+                offset: (this.lastOffset += indentationLength),
               },
             },
-            content: {
-              type: "BlockLineContent",
-              value: lineContent,
-              position: {
-                start: {
-                  column: 1 + indentation,
-                  line: lineNumber,
-                  offset: this.lastOffset,
-                },
-                end: {
-                  column: 1 + indentation + lineContentLength,
-                  line: lineNumber,
-                  offset: (this.lastOffset += lineContentLength),
-                },
+          },
+          content: {
+            type: "blockLineContent",
+            value: lineContent,
+            position: {
+              start: {
+                column: 1 + indentationLength,
+                line: lineNumber,
+                offset: this.lastOffset,
+              },
+              end: {
+                column: 1 + indentationLength + lineContentLength,
+                line: lineNumber,
+                offset: (this.lastOffset += lineContentLength),
               },
             },
           },
@@ -90,39 +87,39 @@ export class BlockSyntaxTreeBuilder {
     return this;
   }
 
-  newBlockLine(indentation: number, lineContent: string) {
+  newBlockLine(indentationText: string, lineContent: string) {
     this.lastOffset += LINE_BREAK_LENGTH;
     const lineNumber = this.blocks.children.length + 1;
     const lineContentLength = lineContent.length;
+    const indentationLength = indentationText.length;
     this.activeBlock!.children.push({
-      type: "ChildBlockLine",
-      data: {
-        indentation: {
-          type: "BlockLineIndentation",
-          value: indentation,
-          position: {
-            start: { column: 1, line: lineNumber, offset: this.lastOffset },
-            end: {
-              column: 1,
-              line: lineNumber,
-              offset: (this.lastOffset += indentation),
-            },
+      type: "childBlockLine",
+      indentation: {
+        type: "blockLineIndentation",
+        indentation: indentationLength,
+        value: indentationText,
+        position: {
+          start: { column: 1, line: lineNumber, offset: this.lastOffset },
+          end: {
+            column: 1,
+            line: lineNumber,
+            offset: (this.lastOffset += indentationLength),
           },
         },
-        content: {
-          type: "BlockLineContent",
-          value: lineContent,
-          position: {
-            start: {
-              column: 1 + indentation,
-              line: lineNumber,
-              offset: this.lastOffset,
-            },
-            end: {
-              column: 1 + indentation + lineContentLength,
-              line: lineNumber,
-              offset: (this.lastOffset += lineContentLength),
-            },
+      },
+      content: {
+        type: "blockLineContent",
+        value: lineContent,
+        position: {
+          start: {
+            column: 1 + indentationLength,
+            line: lineNumber,
+            offset: this.lastOffset,
+          },
+          end: {
+            column: 1 + indentationLength + lineContentLength,
+            line: lineNumber,
+            offset: (this.lastOffset += lineContentLength),
           },
         },
       },

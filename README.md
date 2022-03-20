@@ -22,6 +22,12 @@ Install dependencies
 yarn install
 ```
 
+## Testing
+
+Packages usually have unit and component tests. Unit tests address the smallest unit and also live in the `src` folder of a project with the `.test.ts` extension.
+
+The `tests` folder holds component tests that test a larger function of the package. This folder might also include test resources and more complex testing scenarios that would pollute the `src` folder.
+
 ## Continuous Deployments
 
 Every push to master triggers an automatic deployment of the noteberry documentation (docs). This includes all demos for packages and the landing page.

@@ -20,17 +20,17 @@ export function parseBlocks(content: string) {
     const blockMarkerResult = /^\W*- /.exec(line);
     if (blockMarkerResult) {
       parsedFirstLineWithBlockMarker = true;
-      const blockIndentation = blockMarkerResult[0].length;
-      const blockLineContent = line.slice(blockIndentation);
+      const blockIndentation = blockMarkerResult[0];
+      const blockLineContent = line.slice(blockIndentation.length);
       const level = blockIndentationToBlockLevel(
-        blockIndentation,
+        blockIndentation.length,
         indentationLengthPerLevel
       );
       builder.newBlock(level, blockIndentation, blockLineContent);
       stack.push({ level, lines: [blockLineContent] });
     } else {
       if (!stack.length) {
-        builder.newBlock(1, 0, line);
+        builder.newBlock(1, "", line);
         stack.push({
           level: 1,
           lines: [line],
@@ -47,7 +47,7 @@ export function parseBlocks(content: string) {
           indentationLengthPerLevel
         );
         builder.newBlockLine(
-          line.length - lineContentWithoutIndentation.length,
+          line.slice(0, line.length - lineContentWithoutIndentation.length),
           lineContentWithoutIndentation
         );
         currentBlockNode.lines.push(lineContentWithoutIndentation);

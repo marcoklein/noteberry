@@ -1,33 +1,66 @@
-import { Literal, Node, Parent, Position } from "unist";
+import { Literal as UnistLiteral, Node, Parent, Position } from "unist";
 
-export interface BlockLineIndentation extends Literal<number> {
-  type: "BlockLineIndentation";
+interface Literal extends UnistLiteral {
+  value: string;
+}
+
+/**
+ * Indendation of the block line.
+ */
+export interface BlockLineIndentation extends Literal {
+  type: "blockLineIndentation";
+  position: Position;
+  /**
+   * Number of characters of the indentation.
+   */
+  indentation: number;
+}
+
+/**
+ * Text content of a block line.
+ */
+export interface BlockLineContent extends Literal {
+  type: "blockLineContent";
+  position: Position;
+  /**
+   * Text content of the block line.
+   */
+  value: string;
+}
+
+/**
+ * An empty line in the document.
+ */
+export interface EmptyLine extends Literal {
+  type: "emptyLine";
   position: Position;
 }
 
-export interface BlockLineContent extends Literal<string> {
-  type: "BlockLineContent";
-  position: Position;
-}
-
-export interface EmptyLine extends Literal<string> {
-  type: "EmptyLine";
-  position: Position;
-}
-
+/**
+ * Line that belongs to a block and has a certain indentation and content.
+ */
 export interface BlockLine extends Node {
-  type: "RootBlockLine" | "ChildBlockLine";
-  data: {
-    indentation: BlockLineIndentation;
-    content: BlockLineContent;
-  };
+  type: "rootBlockLine" | "childBlockLine";
+  indentation: BlockLineIndentation;
+  content: BlockLineContent;
 }
 
-export interface Block extends Parent<BlockLine, { level: number }> {
-  type: "Block";
-  data: { level: number };
+/**
+ * A single block that might span multiple lines.
+ */
+export interface Block extends Parent {
+  type: "block";
+  children: BlockLine[];
+  /**
+   * 1-based level.
+   */
+  level: number;
 }
 
-export interface BlockList extends Parent<Block | EmptyLine> {
-  type: "BlockList";
+/**
+ * Root list of all blocks.
+ */
+export interface BlockList extends Parent {
+  type: "blockList";
+  children: (Block | EmptyLine)[];
 }
