@@ -1,2 +1,2 @@
-export { parseBlocks } from "./parse-blocks";
-export * from "./block-node";
+export { parseBlocks } from "./parse-blocks.js";
+export * from "./block-node.js";

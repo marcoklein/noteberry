@@ -1,4 +1,4 @@
-import { parseBlocks } from "./parse-blocks.js";
+import { parseBlocks } from "./";
 import { expect } from "chai";
 import { BlockSyntaxTreeBuilder } from "./syntax-tree-builder.js";
 

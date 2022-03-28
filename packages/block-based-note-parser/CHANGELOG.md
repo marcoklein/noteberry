@@ -3,6 +3,7 @@
 ## 0.2.0
 
 - Change syntax tree names to match MDAST naming convention with `camelCase`.
+- Fix exports of library.
 
 ## 0.1.1
 

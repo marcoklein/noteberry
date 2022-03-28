@@ -7,6 +7,9 @@ import { visit } from "unist-util-visit";
 
 export interface WikiLinkNode extends UNIST.Node {
   type: "wikiLink";
+  /**
+   * Name of link.
+   */
   value: string;
   data: {
     alias: string;
@@ -25,7 +28,7 @@ const PARSER = unified()
  *
  * @param content Text content to parse.
  */
-export function parseMarkdown(content: string) {
+export function parseMarkdown(content: string): SyntaxTree {
   const syntaxTree = PARSER.parse(content);
   visit(syntaxTree, "wikiLink", (wikiLinkNode) => {
     const value = wikiLinkNode.value;

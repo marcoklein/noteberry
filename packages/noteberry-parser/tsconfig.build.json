@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "rootDir": ".",
+    "rootDir": "src",
     "moduleResolution": "node",
     "outDir": "dist",
     "declaration": true,
@@ -11,10 +11,10 @@
     "strict": true,
     "strictNullChecks": true,
     "skipLibCheck": true,
-    "skipDefaultLibCheck": true,
     "paths": {
       "remark-wiki-link": ["./typings/remark-wiki-link.d.ts"]
     }
   },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  "include": ["src/**/*.ts"],
+  "exclude": ["**/*.test.ts"]
 }

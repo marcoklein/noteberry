@@ -2254,6 +2254,13 @@ bl@^4.0.3, bl@^4.1.0:
     inherits "^2.0.4"
     readable-stream "^3.4.0"
 
+block-based-note-parser@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/block-based-note-parser/-/block-based-note-parser-0.1.1.tgz#997a53661d1841ebd2b30fac364e9b5cdf91b7a9"
+  integrity sha512-UVsi06J85AbZfG7xrYZs1gOT1SpF4pP6a6jVdMpkiArISpupgQQG4wgbHD0krdOcSq68lBqWDeh7qAdaLfJwlg==
+  dependencies:
+    "@types/unist" "^2.0.6"
+
 body-parser@^1.19.0:
   version "1.19.2"
   resolved "https://registry.yarnpkg.com/body-parser/-/body-parser-1.19.2.tgz#4714ccd9c157d44797b8b5607d72c0b89952f26e"

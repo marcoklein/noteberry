@@ -8,7 +8,7 @@
   "scripts": {
     "test": "mocha --loader=ts-node/esm src/**/*.test.ts tests/**/*.test.ts",
     "test:watch": "nodemon --exec \"yarn test\" --watch src --watch tests -e js,ts,md",
-    "build": "rimraf dist/* && tsc",
+    "build": "rimraf dist/* && tsc -p tsconfig.build.json",
     "prepublishOnly": "yarn test && yarn build",
     "release": "yarn publish --non-interactive --registry 'https://registry.npmjs.org/'"
   },
@@ -30,7 +30,7 @@
     "typescript": "^4.6.2"
   },
   "dependencies": {
-    "block-based-note-parser": "^0.1.1",
+    "block-based-note-parser": "^0.2.0",
     "remark-parse": "^10.0.1",
     "remark-wiki-link": "^1.0.4",
     "unist-util-visit": "^4.1.0"

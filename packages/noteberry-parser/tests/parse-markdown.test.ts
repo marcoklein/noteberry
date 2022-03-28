@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { visit } from "unist-util-visit";
-import { parseMarkdown } from "../src/parse-markdown.js";
+import { parseMarkdown } from "../src/functions/parse-markdown.js";
 
 describe("parse markdown", () => {
   it("should extract wikilinks", () => {

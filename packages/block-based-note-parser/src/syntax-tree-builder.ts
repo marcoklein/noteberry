@@ -1,4 +1,4 @@
-import { Block, BlockList } from "./block-node";
+import { Block, BlockList } from "./block-node.js";
 const LINE_BREAK_LENGTH = 1;
 
 /**

@@ -1,2 +1,0 @@
-- Topic
-- Linked by several journal entries.
